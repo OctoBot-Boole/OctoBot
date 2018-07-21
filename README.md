@@ -3,7 +3,7 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mylorik/OctoBot-Core/blob/master/LICENSE)
 
 
-**Information about he bot: https://discordbots.org/bot/423593006436712458**
+**Information about the bot: https://discordbots.org/bot/423593006436712458**
 
 -------------------------------------------------------------------------------------------------------------------
 
