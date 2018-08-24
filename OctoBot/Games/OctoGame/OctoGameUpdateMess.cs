@@ -10,7 +10,7 @@ using OctoBot.Games.OctoGame.GameUsers;
 
 namespace OctoBot.Games.OctoGame
 {
-    public class OctoGameUpdateMess : ModuleBase<SocketCommandContext>
+    public class OctoGameUpdateMess : ModuleBase<ShardedCommandContext>
     {
         public static class FighhtReaction
         {

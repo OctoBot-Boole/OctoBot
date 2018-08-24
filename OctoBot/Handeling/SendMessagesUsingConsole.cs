@@ -8,7 +8,7 @@ namespace OctoBot.Handeling
 {
     internal class SendMessagesUsingConsole
     {
-        internal static void ConsoleInput(DiscordSocketClient client)
+        internal static void ConsoleInput(DiscordShardedClient client)
         {
             var input = string.Empty;
 
@@ -22,7 +22,7 @@ namespace OctoBot.Handeling
             }
         }
 
-        private static async void ConsoleSendMessage(DiscordSocketClient client)
+        private static async void ConsoleSendMessage(DiscordShardedClient client)
         {
             try
             {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -15,7 +14,7 @@ using OctoBot.Handeling;
 
 namespace OctoBot.Commands
 {
-    public class ServerManaging : ModuleBase<SocketCommandContextCustom>
+    public class ServerManaging : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("purge",  RunMode = RunMode.Async)]
         [Alias("clean", "убрать", "clear")]
@@ -24,9 +23,9 @@ namespace OctoBot.Commands
         {
             try
             {
-                if (number > 51 || number < 0)
+                if (number > 101 || number < 0)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, "Limit 50 messages. You may say `clear 5` or `clear 5 @user`" +
+                    await CommandHandeling.ReplyAsync(Context, "Limit 100 messages. You may say `clear 5` or `clear 5 @user`" +
                                                                                           "if you want to delte a users' messages");
                     return;
                 }
@@ -39,7 +38,7 @@ namespace OctoBot.Commands
                 {
                     if (user == null)
                     {
-                        var items = await Context.Channel.GetMessagesAsync(number + 1).FlattenAsync();
+                        var items = Context.Channel.GetCachedMessages(number+1);
                         if (Context.Channel is ITextChannel channel) await channel.DeleteMessagesAsync(items);
                     }
                     else
@@ -76,7 +75,7 @@ namespace OctoBot.Commands
                 }
                 else
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! You do not have a tolerance of this level!");
                 }
             }
@@ -97,7 +96,7 @@ namespace OctoBot.Commands
             {
                 if (message == null)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! You need to specify reason!");
                     return;
                 }
@@ -114,7 +113,7 @@ namespace OctoBot.Commands
                     UserAccounts.SaveAccounts(Context.Guild.Id);
 
 
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         user.Mention + " Was Forewarned");
 
 
@@ -131,7 +130,7 @@ namespace OctoBot.Commands
                 }
                 else
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! You do not have a tolerance of this level!");
                 }
             }
@@ -153,7 +152,7 @@ namespace OctoBot.Commands
             {
                 if (reason == null)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! You need to specify reason!");
                     return;
                 }
@@ -191,7 +190,7 @@ namespace OctoBot.Commands
             {
                 if (reason == null)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! You need to specify reason!");
                     return;
                 }
@@ -227,7 +226,7 @@ namespace OctoBot.Commands
             {
                 if (warningMess == null)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! You need to specify reason!");
                     return;
                 }
@@ -269,7 +268,7 @@ namespace OctoBot.Commands
                     UserAccounts.SaveAccounts(0);
 
 
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, $"{user.Mention} бу!");
+                    await CommandHandeling.ReplyAsync(Context, $"{user.Mention} бу!");
                 }
             }
             catch
@@ -297,7 +296,7 @@ namespace OctoBot.Commands
                 UserAccounts.SaveAccounts(0);
 
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, "boole...");
+                await CommandHandeling.ReplyAsync(Context, "boole...");
             }
         }
 
@@ -315,7 +314,7 @@ namespace OctoBot.Commands
                 UserAccounts.SaveAccounts(Context.Guild.Id);
 
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                await CommandHandeling.ReplyAsync(Context,
                     $"{user.Mention} is now a moderator! Booole~");
             }
         }

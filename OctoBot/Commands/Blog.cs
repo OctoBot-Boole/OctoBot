@@ -12,7 +12,7 @@ using static OctoBot.Configs.Global;
 
 namespace OctoBot.Commands
 {
-    public class Blog : ModuleBase<SocketCommandContextCustom>
+    public class Blog : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("подписчики")]
         [Alias("MySubc", "subscribers", "Subc")]
@@ -23,7 +23,7 @@ namespace OctoBot.Commands
                 var account = UserAccounts.GetAccount(Context.User, Context.Guild.Id);
                 if (account.SubedToYou == null)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         $"На тебя никто не подписан, буль!");
 
 
@@ -45,7 +45,7 @@ namespace OctoBot.Commands
                 embed.WithTitle("Твои подписчики:");
                 embed.WithDescription($"{mess}");
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             catch
             {
@@ -65,7 +65,7 @@ namespace OctoBot.Commands
                 var account = UserAccounts.GetAccount(Context.User, Context.Guild.Id);
                 if (account.SubToPeople == null)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         $"Ты и так ни на кого не подписан, буль!");
 
 
@@ -87,7 +87,7 @@ namespace OctoBot.Commands
                 embed.WithTitle("Твои подписки:");
                 embed.WithDescription($"{mess}");
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             catch
             {
@@ -106,7 +106,7 @@ namespace OctoBot.Commands
             {
                 if (user.Id == 423593006436712458)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Нельзя подписываться на осьминожку!");
 
 
@@ -115,7 +115,7 @@ namespace OctoBot.Commands
 
                 if (user.IsBot)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Нельзя подписываться на бота.");
 
 
@@ -132,7 +132,7 @@ namespace OctoBot.Commands
 
                     if (accountSubs.Any(t => t == user.Id.ToString()))
                     {
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                        await CommandHandeling.ReplyAsync(Context,
                             $"Ты уже подписан на {user.Username}.");
 
 
@@ -146,7 +146,7 @@ namespace OctoBot.Commands
                 UserAccounts.SaveAccounts(Context.Guild.Id);
 
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                await CommandHandeling.ReplyAsync(Context,
                     $"Ты подписался на {user.Username}!\nЕсли хочешь отписаться введи команду ***unsub [user]**");
             }
             catch
@@ -167,7 +167,7 @@ namespace OctoBot.Commands
                 var account = UserAccounts.GetAccount(Context.User, Context.Guild.Id);
                 if (account.SubToPeople == null)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Ты и так ни на кого не подписан, буль!");
 
 
@@ -185,7 +185,7 @@ namespace OctoBot.Commands
 
                     if (check >= accountSubs.Length && Convert.ToUInt64(t) != user.Id)
                     {
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                        await CommandHandeling.ReplyAsync(Context,
                             $"Ты **не был** подписан на {user.Username}.");
 
 
@@ -209,7 +209,7 @@ namespace OctoBot.Commands
                 UserAccounts.SaveAccounts(Context.Guild.Id);
 
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                await CommandHandeling.ReplyAsync(Context,
                     $"Ты был успешно ансабнут от {user.Username}");
             }
             catch
@@ -230,7 +230,7 @@ namespace OctoBot.Commands
                 var account = UserAccounts.GetAccount(Context.User, Context.Guild.Id);
                 if (account.SubedToYou == null)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "На тебя никто не подписан ещё буль... Попробуй чем то завлечь людей сначала!");
 
 
@@ -319,7 +319,7 @@ namespace OctoBot.Commands
                 var account = UserAccounts.GetAccount(Context.User, Context.Guild.Id);
                 if (account.SubedToYou == null)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "На тебя никто не подписан ещё буль... Попробуй чем то завлечь людей сначала!");
 
 
@@ -328,7 +328,7 @@ namespace OctoBot.Commands
 
                 if (url.Length < 5)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "буууу! Ссылка не в правильном формате!");
 
 
@@ -338,7 +338,7 @@ namespace OctoBot.Commands
                 var httpsCheck = $"{url[0]}{url[1]}{url[2]}{url[3]}{url[4]}";
                 if (httpsCheck != "https")
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "буууу! Ссылка не в правильном формате!");
 
 

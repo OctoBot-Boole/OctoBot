@@ -9,10 +9,17 @@ using OctoBot.Helper;
 
 namespace OctoBot.Commands
 {
-    public class OctopusPic : ModuleBase<SocketCommandContextCustom>
+    public class OctopusPic : ModuleBase<ShardedCommandContextCustom>
     {
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 #pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
+
+        private readonly SecureRandom _secureRandom;
+
+        public OctopusPic(SecureRandom secureRandom)
+        {
+            _secureRandom = secureRandom;
+        }
 
         [Command("octo")]
         [Alias("окто", "octopus", "Осьминог", "Осьминожка", "Осьминога", "o", "oct", "о")]
@@ -26,7 +33,7 @@ namespace OctoBot.Commands
 
                 if (difference.TotalHours > 5)
                 {
-                    var randomKeyPossible = SecureRandom.Random(0, 100000);
+                    var randomKeyPossible = _secureRandom.Random(0, 100000);
                     if (randomKeyPossible == 1448)
                         embed.AddField("Boole!?", "What is it? Some king of a quest... I found a number - **228**, " +
                                                   "what can it mean... if you will know, say `quest ANSWER`, I think this should be one eglish word.");
@@ -35,7 +42,7 @@ namespace OctoBot.Commands
                 account.LastOctoPic = DateTime.UtcNow;
                 UserAccounts.SaveAccounts(0);
 
-                var index = SecureRandom.Random(0, 254);
+                var index = _secureRandom.Random(0, 254);
                 if (index == 5 || index == 38 || index == 69)
                 {
                     var lll = await Context.Channel.SendMessageAsync("boole");
@@ -43,15 +50,15 @@ namespace OctoBot.Commands
                 }
                 else
                 {
-                    var octoIndex = SecureRandom.Random(0, OctoPicPull.OctoPics.Length);
+                    var octoIndex = _secureRandom.Random(0, OctoPicPull.OctoPics.Length-1);
                     var octoToPost = OctoPicPull.OctoPics[octoIndex];
 
 
-                    var color1Index = SecureRandom.Random(0, 254);
-                    var color2Index = SecureRandom.Random(0, 254);
-                    var color3Index = SecureRandom.Random(0, 254);
+                    var color1Index = _secureRandom.Random(0, 254);
+                    var color2Index = _secureRandom.Random(0, 254);
+                    var color3Index = _secureRandom.Random(0, 254);
 
-                    var randomIndex = SecureRandom.Random(0, OctoNamePull.OctoNameRu.Length);
+                    var randomIndex = _secureRandom.Random(0, OctoNamePull.OctoNameRu.Length);
                     var randomOcto = OctoNamePull.OctoNameRu[randomIndex];
 
 
@@ -62,7 +69,7 @@ namespace OctoBot.Commands
                     embed.WithImageUrl("" + octoToPost);
 
 
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                    await CommandHandeling.ReplyAsync(Context, embed);
 
 
                     if (octoIndex == 19)
@@ -102,7 +109,7 @@ namespace OctoBot.Commands
 
                 if (passCheck.OctoPass >= 1)
                 {
-                    var index = SecureRandom.Random(0, 254);
+                    var index = _secureRandom.Random(0, 254);
                     if (index == 68 || index == 228 || index == 18)
                     {
                         var lll = await Context.Channel.SendMessageAsync("boole");
@@ -119,11 +126,11 @@ namespace OctoBot.Commands
 
                         var octoToPost = OctoPicPull.OctoPics[selection];
 
-                        var color1Index = SecureRandom.Random(0, 254);
-                        var color2Index = SecureRandom.Random(0, 254);
-                        var color3Index = SecureRandom.Random(0, 254);
+                        var color1Index = _secureRandom.Random(0, 254);
+                        var color2Index = _secureRandom.Random(0, 254);
+                        var color3Index = _secureRandom.Random(0, 254);
 
-                        var randomIndex = SecureRandom.Random(0, OctoNamePull.OctoNameRu.Length);
+                        var randomIndex = _secureRandom.Random(0, OctoNamePull.OctoNameRu.Length);
                         var randomOcto = OctoNamePull.OctoNameRu[randomIndex];
 
                         var embed = new EmbedBuilder();
@@ -134,13 +141,13 @@ namespace OctoBot.Commands
                         embed.WithImageUrl("" + octoToPost);
 
 
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                        await CommandHandeling.ReplyAsync(Context, embed);
                       
                     }
                 }
                 else
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, "Boole! You do not have a tolerance of this level!");
+                    await CommandHandeling.ReplyAsync(Context, "Boole! You do not have a tolerance of this level!");
                 }
             }
             catch

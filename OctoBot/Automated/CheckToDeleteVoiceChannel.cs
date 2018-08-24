@@ -21,8 +21,7 @@ namespace OctoBot.Automated
                 Interval = 30000,
                 Enabled = true
             };
-            _loopingTimer.Elapsed += CheckToDeleteVoice;
-            ;
+            _loopingTimer.Elapsed += CheckToDeleteVoice;    
             return Task.CompletedTask;
         }
 
@@ -49,7 +48,7 @@ namespace OctoBot.Automated
 
                         if (voiceChan.Users.Count <= 0)
                         {
-                            voiceChan?.DeleteAsync();
+                            voiceChan.DeleteAsync();
                         }
                         else if (voiceChan.Users.Count >= 1)
                         {

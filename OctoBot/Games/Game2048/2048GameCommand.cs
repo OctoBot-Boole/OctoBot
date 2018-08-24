@@ -6,7 +6,7 @@ using OctoBot.Custom_Library;
 
 namespace OctoBot.Games.Game2048
 {
-    public class GameBridge : ModuleBase<SocketCommandContextCustom>
+    public class GameBridge : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("2048")]
         public async Task Start1024Game()

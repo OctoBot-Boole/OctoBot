@@ -15,8 +15,8 @@ namespace OctoBot.Handeling
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 #pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
 
-        private readonly DiscordSocketClient _client;
-        private readonly CommandHandelingSendingAndUpdatingMessages _commandHandler;
+        private readonly DiscordShardedClient _client;
+        private readonly CommandHandeling _commandHandler;
         private readonly ServerActivityLogger _serverActivityLogger;
         private readonly CheckIfCommandGiveRole _checkIfCommandGiveRole;
         private readonly ReactionsHandelingForBlogAndArt _reactionsHandelingForBlogAndArt;
@@ -24,12 +24,13 @@ namespace OctoBot.Handeling
         private readonly CheckForVoiceChannelStateForVoiceCommand _checkForVoiceChannelStateForVoiceCommand;
         private readonly LvLing _lvLing;
         private readonly UserSkatisticsCounter _userSkatisticsCounter;
+        private readonly TimerForChangingAvatar _timerForChangingAvatar;
 
-        public DiscordEventHandler(DiscordSocketClient client, CommandHandelingSendingAndUpdatingMessages commandHandler
+        public DiscordEventHandler(DiscordShardedClient client, CommandHandeling commandHandler
             , ServerActivityLogger serverActivityLogger, CheckIfCommandGiveRole checkIfCommandGiveRole,
             CheckForVoiceChannelStateForVoiceCommand checkForVoiceChannelStateForVoiceCommand,
             GiveRoleOnJoin giveRoleOnJoin, ReactionsHandelingForBlogAndArt reactionsHandelingForBlogAndArt,
-            LvLing lvLing, UserSkatisticsCounter userSkatisticsCounter)
+            LvLing lvLing, UserSkatisticsCounter userSkatisticsCounter, TimerForChangingAvatar timerForChangingAvatar)
         {
             _client = client;
             _commandHandler = commandHandler;
@@ -40,6 +41,7 @@ namespace OctoBot.Handeling
             _reactionsHandelingForBlogAndArt = reactionsHandelingForBlogAndArt;
             _lvLing = lvLing;
             _userSkatisticsCounter = userSkatisticsCounter;
+            _timerForChangingAvatar = timerForChangingAvatar;
         }
 
         public void InitDiscordEvents()
@@ -47,16 +49,14 @@ namespace OctoBot.Handeling
             _client.ChannelCreated += ChannelCreated;
             _client.ChannelDestroyed += ChannelDestroyed;
             _client.ChannelUpdated += ChannelUpdated;
-            _client.Connected += Connected;
             _client.CurrentUserUpdated += CurrentUserUpdated;
-            _client.Disconnected += Disconnected;
+            _client.ShardDisconnected += _client_ShardDisconnected;
             _client.GuildAvailable += GuildAvailable;
             _client.GuildMembersDownloaded += GuildMembersDownloaded;
             _client.GuildMemberUpdated += GuildMemberUpdated;
             _client.GuildUnavailable += GuildUnavailable;
             _client.GuildUpdated += GuildUpdated;
             _client.JoinedGuild += JoinedGuild;
-            _client.LatencyUpdated += LatencyUpdated;
             _client.LeftGuild += LeftGuild;
             _client.Log += Log;
             _client.LoggedIn += LoggedIn;
@@ -67,7 +67,8 @@ namespace OctoBot.Handeling
             _client.ReactionAdded += ReactionAdded;
             _client.ReactionRemoved += ReactionRemoved;
             _client.ReactionsCleared += ReactionsCleared;
-            _client.Ready += Ready;
+            _client.ShardReady += _client_ShardReady;
+            _client.ShardConnected += _client_ShardConnected;
             _client.RecipientAdded += RecipientAdded;
             _client.RecipientRemoved += RecipientRemoved;
             _client.RoleCreated += RoleCreated;
@@ -82,6 +83,29 @@ namespace OctoBot.Handeling
             _client.UserVoiceStateUpdated += UserVoiceStateUpdated;
         }
 
+        private async Task _client_ShardReady(DiscordSocketClient arg)
+        {
+            GreenBuuTimerClass.StartTimer(); ////////////// Timer1 Green Boo starts
+            CheckForPull.CheckTimerForPull();
+            CheckForMute.CheckTimer();
+            CheckReminders.CheckTimer();
+            CheckBirthday.CheckTimer();
+            _timerForChangingAvatar.TimerForChangeBotAvatar();
+            CheckToDeleteVoiceChannel.CheckTimer();
+            //  _client.Ready += YellowTurtle.StartTimer; //// Timer3
+        }
+
+        private async Task _client_ShardDisconnected(Exception arg1, DiscordSocketClient arg2)
+        {
+            Console.WriteLine($"Shard {arg2.ShardId} Disconnected");
+            _serverActivityLogger.Client_Disconnected(arg1);
+            
+        }
+
+        private async Task _client_ShardConnected(DiscordSocketClient arg)
+        {
+            _serverActivityLogger.Client_Connected();
+        }
 
         private async Task ChannelCreated(SocketChannel channel)
         {
@@ -98,18 +122,9 @@ namespace OctoBot.Handeling
             _serverActivityLogger.Client_ChannelUpdated(channelBefore, channelAfter);
         }
 
-        private async Task Connected()
-        {
-            _serverActivityLogger.Client_Connected();
-        }
 
         private async Task CurrentUserUpdated(SocketSelfUser userBefore, SocketSelfUser userAfter)
         {
-        }
-
-        private async Task Disconnected(Exception exception)
-        {
-            _serverActivityLogger.Client_Disconnected(exception);
         }
 
         private async Task GuildAvailable(SocketGuild guild)
@@ -138,9 +153,6 @@ namespace OctoBot.Handeling
             _serverActivityLogger.Client_JoinedGuild(guild);
         }
 
-        private async Task LatencyUpdated(int latencyBefore, int latencyAfter)
-        {
-        }
 
         private async Task LeftGuild(SocketGuild guild)
         {
@@ -216,17 +228,6 @@ namespace OctoBot.Handeling
 
         private async Task ReactionsCleared(Cacheable<IUserMessage, ulong> cacheMessage, ISocketMessageChannel channel)
         {
-        }
-
-        private async Task Ready()
-        {
-            GreenBuuTimerClass.StartTimer(); ////////////// Timer1 Green Boo starts
-            CheckForPull.CheckTimerForPull();
-            CheckForMute.CheckTimer();
-            CheckReminders.CheckTimer();
-            TimerForChangingAvatar.TimerForChangeBotAvatar();
-            CheckToDeleteVoiceChannel.CheckTimer();
-            //  _client.Ready += YellowTurtle.StartTimer; //// Timer3
         }
 
         private async Task RecipientAdded(SocketGroupUser user)

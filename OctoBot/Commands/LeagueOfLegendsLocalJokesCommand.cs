@@ -8,7 +8,7 @@ using OctoBot.Handeling;
 
 namespace OctoBot.Commands
 {
-    public class LoL : ModuleBase<SocketCommandContextCustom>
+    public class LoL : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("я проиграл")]
         [Alias("я проиграла", "я проиграл.", "я проиграла.", "я проиграл...", "я проиграл..", "я проиграла...")]
@@ -28,7 +28,7 @@ namespace OctoBot.Commands
                 embed.WithDescription($"Ты впервые проиграл!");
 
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             else
             {
@@ -42,7 +42,7 @@ namespace OctoBot.Commands
                 else
                     embed.WithDescription($"Это уже в {account.Lost}й раз...");
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
         }
 
@@ -72,7 +72,7 @@ namespace OctoBot.Commands
             var embed = new EmbedBuilder();
             embed.WithImageUrl($"{thamKenchToPost}");
 
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+            await CommandHandeling.ReplyAsync(Context, embed);
         }
 
         [Command("А там")]
@@ -88,7 +88,7 @@ namespace OctoBot.Commands
             var embed = new EmbedBuilder();
             embed.WithImageUrl($"{thamKenchToPost}");
 
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+            await CommandHandeling.ReplyAsync(Context, embed);
         }
 
 
@@ -101,7 +101,7 @@ namespace OctoBot.Commands
                 "https://media.discordapp.net/attachments/238416197337481217/436790640861511691/--2oOzEe8RI.png");
             embed.WithTitle("10 заповедей бога лола");
 
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+            await CommandHandeling.ReplyAsync(Context, embed);
         }
     }
 }

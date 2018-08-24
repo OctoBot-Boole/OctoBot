@@ -13,7 +13,7 @@ using OctoBot.Custom_Library;
 namespace OctoBot.Commands.PersonalCommands
 {
     //Yellow Turtle Event ( Done)
-    public class YellowTurtle : ModuleBase<SocketCommandContextCustom>
+    public class YellowTurtle : ModuleBase<ShardedCommandContextCustom>
     {
         private static SocketTextChannel _channel;
         private static Timer _loopingTimer;

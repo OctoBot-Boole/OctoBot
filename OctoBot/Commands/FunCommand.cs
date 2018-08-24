@@ -9,7 +9,7 @@ using OctoBot.Helper;
 
 namespace OctoBot.Commands
 {
-    public class Fun : ModuleBase<SocketCommandContextCustom>
+    public class Fun : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("pick")]
         public async Task Pick([Remainder] string message)
@@ -29,7 +29,7 @@ namespace OctoBot.Commands
                 embed.WithThumbnailUrl("https://i.imgur.com/I3o0bm4.jpg");
 
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             catch
             {
@@ -42,7 +42,7 @@ namespace OctoBot.Commands
         [Alias("пинг")]
         public async Task DefaultPing()
         {
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, $"{Context.User.Mention} pong!");
+            await CommandHandeling.ReplyAsync(Context, $"{Context.User.Mention} pong!");
         }
 
 
@@ -74,7 +74,7 @@ namespace OctoBot.Commands
 
                 if (amount > userAccount.Points || amount <= 0)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "You do not have enough OktoPoints! Or you just entered something wrong.");
 
                     return;
@@ -85,7 +85,7 @@ namespace OctoBot.Commands
                 var slots = randSlot.Next(72);
 
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                await CommandHandeling.ReplyAsync(Context,
                     $"Number of slots **{slots}**. What is your choice?");
 
                 var response = await AwaitForUserMessage.AwaitMessage(Context.User.Id, Context.Channel.Id, 10000);
@@ -105,7 +105,7 @@ namespace OctoBot.Commands
                         userAccount.Points += bank;
                         UserAccounts.SaveAccounts(Context.Guild.Id);
 
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                        await CommandHandeling.ReplyAsync(Context,
                             $"You won **{bank}** OctoPoints!\nNow you have **{userAccount.Points}** OctoPoints!");
 
                         userAccount.Points += bank;
@@ -113,7 +113,7 @@ namespace OctoBot.Commands
                     }
                     else
                     {
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                        await CommandHandeling.ReplyAsync(Context,
                             $"booole. Yuor **{amount}** OctoPoints stayed with us. Btw, number was **{random}**");
 
 
@@ -126,7 +126,7 @@ namespace OctoBot.Commands
 
 
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         $"The choice should be between 0 and {slots}, answer only with a number.");
                 }
             }
@@ -146,7 +146,7 @@ namespace OctoBot.Commands
 
             if (prefix == null)
             {
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                await CommandHandeling.ReplyAsync(Context,
                     $"Your prefix: **{account.MyPrefix}**");
                 return;
             }
@@ -156,18 +156,18 @@ namespace OctoBot.Commands
                 account.MyPrefix = prefix;
                 if (prefix.Contains("everyone") || prefix.Contains("here"))
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         $"Boooooo! no `here` or `everyone` prefix!");
                     return;
                 }
 
                 UserAccounts.SaveAccounts(Context.Guild.Id);
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                await CommandHandeling.ReplyAsync(Context,
                     $"Booole~, your own prefix is now **{prefix}**");
             }
             else
             {
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                await CommandHandeling.ReplyAsync(Context,
                     "Booooo! Prefix have to be less than 100 characters");
             }
         }

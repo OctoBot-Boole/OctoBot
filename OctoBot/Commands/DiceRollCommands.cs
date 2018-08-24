@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -8,8 +10,15 @@ using OctoBot.Helper;
 
 namespace OctoBot.Commands
 {
-    public class DiceRollCommands : ModuleBase<SocketCommandContextCustom>
+    public class DiceRollCommands : ModuleBase<ShardedCommandContextCustom>
     {
+        private readonly SecureRandom _secureRandom;
+
+        public DiceRollCommands(SecureRandom secureRandom)
+        {
+            _secureRandom = secureRandom;
+        }
+
         [Command("roll")]
         [Alias("Роллл", "Ролл")]
         public async Task Roll(int number, int times)
@@ -17,9 +26,9 @@ namespace OctoBot.Commands
             try
             {
                 var mess = "";
-                if (times > 100)
+                if (times > 101)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! We are not going to roll that many times!");
 
 
@@ -28,7 +37,7 @@ namespace OctoBot.Commands
 
                 if (number > 999999999)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! This numbers is way too big for us :c");
 
 
@@ -37,7 +46,7 @@ namespace OctoBot.Commands
 
                 for (var i = 0; i < times; i++)
                 {
-                    var randomIndexRoll = SecureRandom.Random(1, number);
+                    var randomIndexRoll = _secureRandom.Random(1, number);
                     mess += $"It's a {randomIndexRoll}!\n";
                 }
 
@@ -46,7 +55,7 @@ namespace OctoBot.Commands
                 embed.WithTitle($"Roll {times} times:");
                 embed.WithDescription($"{mess}");
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             catch
             {
@@ -63,9 +72,9 @@ namespace OctoBot.Commands
         {
             try
             {
-                var randomIndexRoll = SecureRandom.Random(1, number);
+                var randomIndexRoll = _secureRandom.Random(1, number);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, $"It's a {randomIndexRoll}!");
+                await CommandHandeling.ReplyAsync(Context, $"It's a {randomIndexRoll}!");
             }
             catch
             {
@@ -167,7 +176,7 @@ namespace OctoBot.Commands
                             int.TryParse(numberString, out var num1);
                             int.TryParse(numberString2, out var num2);
 
-                            var result = CustomCalculator.Calculator(num1, num2, sign);
+                            var result = Calculator(num1, num2, sign);
                             answer = result.Item1;
 
                             if (i == low.Length - 1 && check == 1)
@@ -178,7 +187,7 @@ namespace OctoBot.Commands
                                     embed.AddField($"It's a {answer}!", $"{results}");
 
 
-                                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                                await CommandHandeling.ReplyAsync(Context, embed);
 
                                 return;
                             }
@@ -261,7 +270,161 @@ namespace OctoBot.Commands
                 }
             }
 
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, $"It's a {answer}!");
+            await CommandHandeling.ReplyAsync(Context, $"It's a {answer}!");
+        }
+
+         [Command("testRandom", RunMode = RunMode.Async)]
+         [RequireOwner]
+        public async Task TestRandom(int times, int max, int heimerdonger)
+        {
+            var repeat = 0;
+            var consecutiveNumbers = 0;
+            var repeatSecure = 0;
+            var consecutiveSecure = 0;
+            var repeatNormal = 0;
+            var consecutiveNormal = 0;
+            var distinct1 = 0;
+            var distinctSecure1 = 0;
+            var distinctNormal1 = 0;
+
+            for (var k = 0; k < heimerdonger; k++)
+            {
+                int[] numbers = new int[times];
+                int[] numbersSecure = new int[times];
+                int[] numbersNormal = new int[times];
+
+                var randomS2 = new Random(Guid.NewGuid().GetHashCode());
+                var _random = new Random();
+                for (var i = 0; i < times; i++)
+                {
+                    var randomNumber = randomS2.Next(max); //Random(Guid.NewGuid().GetHashCode())
+
+                    var randomSecure = _secureRandom.Random(1, max);
+
+                    var randomNormal = _random.Next(max); //Random();
+
+
+                    if (numbers.Any(n => n == randomNumber))
+                    {
+                        repeat++;
+                    }
+
+                    if (numbersSecure.Any(n => n == randomSecure))
+                    {
+                        repeatSecure++;
+                    }
+
+                    if (numbersNormal.Any(n => n == randomNormal))
+                    {
+                        repeatNormal++;
+                    }
+
+
+                    numbers[i] = randomNumber;
+                    numbersSecure[i] = randomSecure;
+                    numbersNormal[i] = randomNormal;
+
+                    if (i <= 0) continue;
+                    if (numbers[i - 1] == numbers[i])
+                    {
+                        consecutiveNumbers++;
+                    }
+
+                    if (numbersSecure[i - 1] == numbersSecure[i])
+                    {
+                        consecutiveSecure++;
+                    }
+
+                    if (numbersNormal[i - 1] == numbersNormal[i])
+                    {
+                        consecutiveNormal++;
+                    }
+                }
+
+
+                var distinct = numbers.Distinct().Count();
+                distinct1 += distinct;
+                var distinctNormal = numbersNormal.Distinct().Count();
+                distinctNormal1 += distinctNormal;
+                var distinctSecure = numbersSecure.Distinct().Count();
+                distinctSecure1 += distinctSecure;
+                //var message = String.Join(" ", ordered);
+            }
+
+
+            var winner = "";
+            if (repeat < repeatSecure && repeat < repeatNormal)
+                winner = "Random(Guid.NewGuid().GetHashCode())";
+            if ( repeatSecure < repeat && repeatSecure < repeatNormal)
+                winner = "SecureRandom";
+            if (repeatNormal < repeatSecure && repeatNormal < repeat)
+                winner = "Random()";
+
+
+            var embed = new EmbedBuilder()
+                .WithTitle($"heimerdonger = {heimerdonger}")
+                .AddField("Random(Guid.NewGuid().GetHashCode())", $"**Repeated numbers**: {repeat}\n" +
+                                                                  $"**Distinct numbers**:{distinct1}\n" +
+                                                                  $"**Consecutive numbers**: {consecutiveNumbers}")
+                .AddField("SecureRandom", $"**Repeated numbers**: {repeatSecure}\n" +
+                                          $"**Distinct numbers**:{distinctSecure1}\n" +
+                                          $"**Consecutive numbers**: {consecutiveSecure}")
+                .AddField("Random()", $"**Repeated numbers**: {repeatNormal}\n" +
+                                      $"**Distinct numbers**:{distinctNormal1}\n" +
+                                      $"**Consecutive numbers**: {consecutiveNormal}")
+                .AddField("THE WINNER:", $"{winner}!!!!! ( by lowest Repeated numbers)");
+           
+            await Context.Channel.SendMessageAsync(embed: embed.Build());
+        }
+        
+        public (int, string ) Calculator(int times, int num, char sign)
+        {
+            switch (sign)
+            {
+                case 'm':
+                    break;
+                case 'l':
+                    break;
+                case '+':
+                    return (times + num, "");
+                case '-':
+                    return (times - num, "");
+                case '*':
+                    return (times * num, "");
+                case '/':
+                    return (times / num, "");
+                case 'd':
+                    var result = new List<int>();
+
+                    var answer = 0;
+
+                    if (times <= 0 || num <= 0)
+                        return (0, "error");
+                    if (times == 1)
+                        return (_secureRandom.Random(1, num), "");
+
+                    var resultString = "";
+                    if (times <= 1000 && num <= 120)
+                    {
+                        for (var i = 0; i < times; i++)
+                        {
+                            var lol = _secureRandom.Random(1, num);
+                            result.Add(lol);
+                        }
+
+                        for (var i = 0; i < result.Count; i++)
+                        {
+                            answer += result[i];
+                            resultString += $"{result[i]}";
+                            if (i < result.Count - 1)
+                                resultString += $" + ";
+                        }
+                    }
+
+                    return (answer, resultString);
+            }
+
+            return (0, "error");
         }
     }
 }

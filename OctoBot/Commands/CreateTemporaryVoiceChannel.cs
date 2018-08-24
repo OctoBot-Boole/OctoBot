@@ -8,7 +8,7 @@ using OctoBot.Custom_Library;
 
 namespace OctoBot.Commands
 {
-    public class CreateTemporaryVoiceChannel : ModuleBase<SocketCommandContextCustom>
+    public class CreateTemporaryVoiceChannel : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("voice")]
         [Description(
@@ -62,7 +62,8 @@ namespace OctoBot.Commands
             }
 
             await ReplyAsync(
-                $"Voice Channel have been Created - <#{voiceChannel.Id}>, please join it, or I will delete it rigt away.");
+                $"Voice Channel have been Created, please join it, or I will delete it in 10 min\n" +
+                $"{voiceChannel.CreateInviteAsync().Result.Url}");
         }
     }
 }

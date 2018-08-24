@@ -14,7 +14,7 @@ using OctoBot.Helper;
 
 namespace OctoBot.Commands
 {
-    public class DailyPull : ModuleBase<SocketCommandContextCustom>
+    public class DailyPull : ModuleBase<ShardedCommandContextCustom>
     {
         private readonly AuthDiscordBotListApi _dblApi =
             new AuthDiscordBotListApi(423593006436712458, Config.Bot.DbLtoken);
@@ -89,7 +89,7 @@ namespace OctoBot.Commands
                 {
                     var text = "You have to be lvl 1 or more, to use pull\n" +
                                "You may check your lvl using `stats` command";
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, text);
+                    await CommandHandeling.ReplyAsync(Context, text);
                     return;
                 }
             }
@@ -99,7 +99,7 @@ namespace OctoBot.Commands
 
             if (!await HasVoted(Context.User.Id))
             {
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                await CommandHandeling.ReplyAsync(Context,
                     "Boole-Boole. To use this command, you have to vote here: <https://discordbots.org/bot/423593006436712458>\n" +
                     $"Please, wait for 2-5 minutes after the vote. Thank you boole!\n" +
                     $"{new Emoji("<:octo_hi:465374417644552192>")}");
@@ -131,7 +131,7 @@ namespace OctoBot.Commands
                             "https://media.discordapp.net/attachments/436071383836000256/467134338085945344/20180712_210457.jpg?width=1247&height=702");
                     else
                         embed.WithImageUrl(OctoPicPull.OctoPicsPull[account.DailyPullPoints - 1]);
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                    await CommandHandeling.ReplyAsync(Context, embed);
                     break;
                 case DailyPullResult.Success:
                     if (account.DailyPullPoints == 28)
@@ -139,21 +139,21 @@ namespace OctoBot.Commands
                         embed.AddField("Pull Points",
                             $"**You have all {account.DailyPullPoints} points!!** Within a minute, our turtles will send you a key in DM!\n");
                         embed.WithImageUrl(OctoPicPull.OctoPicsPull[account.DailyPullPoints - 1]);
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                        await CommandHandeling.ReplyAsync(Context, embed);
                     }
                     else if (account.DailyPullPoints < 28)
                     {
                         embed.AddField("Pull Points",
                             $"**You got {pointsToGive} point!** You have now **{account.DailyPullPoints} points**. Try again in 1 day, to get another point!\n");
                         embed.WithImageUrl(OctoPicPull.OctoPicsPull[account.DailyPullPoints - 1]);
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                        await CommandHandeling.ReplyAsync(Context, embed);
                     }
                     else // BACK UP
                     {
                         embed.AddField("Pull Points",
                             $"**You got {pointsToGive} point!** You have now {account.DailyPullPoints} points. Try again in 1 day, to get another point!\n");
                         embed.WithImageUrl(OctoPicPull.OctoPicsPull[27]);
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                        await CommandHandeling.ReplyAsync(Context, embed);
                     }
                     break;
             }
@@ -175,7 +175,7 @@ namespace OctoBot.Commands
                 mylorik.KeyPullKey += gameAndKey[1] + "|";
                 UserAccounts.SaveAccounts(0);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, "Boooole~ We got the key!");
+                await CommandHandeling.ReplyAsync(Context, "Boooole~ We got the key!");
 
 
                 ConsoleLogger.Log($" [ADD KEY] ({Context.User.Username}) - {mess}", ConsoleColor.DarkBlue);
@@ -209,7 +209,7 @@ namespace OctoBot.Commands
                 }
 
 
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+            await CommandHandeling.ReplyAsync(Context,
                 $"ключ **{keyName[index]} {keykey[index]}** был удалён");
             UserAccounts.SaveAccounts(0);
         }
@@ -246,7 +246,7 @@ namespace OctoBot.Commands
                     embed.AddField("Ключи(cont):", $"{keysExtra2}\n**KeyDel [index]** Чтобы удалить ");
 
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             catch
             {
@@ -288,7 +288,7 @@ namespace OctoBot.Commands
                     embed.AddField("Keys(cont):", $"{keysExtra2} ");
 
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             catch
             {
@@ -312,7 +312,7 @@ namespace OctoBot.Commands
                 var account = UserAccounts.GetAccount(Context.User, 0);
                 if (choice == 0)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, "Boole~");
+                    await CommandHandeling.ReplyAsync(Context, "Boole~");
                     account.PullToChoose = null;
                     UserAccounts.SaveAccounts(0);
                     return;
@@ -356,7 +356,7 @@ namespace OctoBot.Commands
                 ConsoleLogger.Log($"DM [KEY] ({Context.User.Username}) - {keyName[index]} : {keykey[index]}",
                     ConsoleColor.DarkBlue);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
 
 
                 mylorik.KeyPullName = null;
@@ -374,7 +374,7 @@ namespace OctoBot.Commands
             catch
             {
                 //    Console.WriteLine(e);
-                //    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                //    await CommandHandeling.ReplyAsync(Context,
                 //        "You do not have any keys, or there is an error. Please contact mylorik#2828 for more info");
             }
         }
@@ -390,7 +390,7 @@ namespace OctoBot.Commands
             embed.WithColor(Color.DarkMagenta);
             embed.AddField("буууль~",
                 $"Мы добавили {pullPoints} пулл Поинтов {user.Mention}. Теперь у него {account.DailyPullPoints} поинтов, буль!");
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+            await CommandHandeling.ReplyAsync(Context, embed);
         }
     }
 }

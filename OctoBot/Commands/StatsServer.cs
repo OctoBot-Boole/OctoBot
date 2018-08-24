@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using OctoBot.Configs;
 using OctoBot.Configs.Server;
+using OctoBot.Configs.Users;
 using OctoBot.Custom_Library;
 using OctoBot.Handeling;
 
 namespace OctoBot.Commands
 {
-    public class StatsServer : ModuleBase<SocketCommandContextCustom>
+    public class StatsServer : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("topRoles")]
         [Alias("topr")]
@@ -23,7 +25,7 @@ namespace OctoBot.Commands
             {
                 if (page < 1)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! Try different page <_<");
                     return;
                 }
@@ -35,7 +37,7 @@ namespace OctoBot.Commands
                 var lastPage = 1 + rolesList.Count / (usersPerPage + 1);
                 if (page > lastPage)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         $"Boole. Last Page is {lastPage}");
                     return;
                 }
@@ -60,7 +62,7 @@ namespace OctoBot.Commands
                         $"**ID:** {orderedRolesList[num].Id}\n\n**_____**", true);
                 }
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embB);
+                await CommandHandeling.ReplyAsync(Context, embB);
             }
             catch
             {
@@ -79,7 +81,7 @@ namespace OctoBot.Commands
             {
                 if (page < 1)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! Try different page <_<");
                     return;
                 }
@@ -94,7 +96,7 @@ namespace OctoBot.Commands
                 var lastPage = 1 + allTextChannelsList.Count / (usersPerPage + 1);
                 if (page > lastPage)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         $"Boole. Last Page is {lastPage}");
                     return;
                 }
@@ -149,12 +151,119 @@ namespace OctoBot.Commands
                         $"**ID:** {something.Id}\n\n**_____**", true);
                 }
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embB);
+                await CommandHandeling.ReplyAsync(Context, embB);
             }
             catch
             {
              //   Console.WriteLine(e.Message);
             }
         }
+
+
+        
+        [Command("sstats")]
+        [Alias("ServerStats", "serverInfo")]
+        [Description("Showing usefull Server Statistics")]
+        public async Task ServerStats(ulong guildId = 0)
+        {
+            try
+            {
+                SocketGuild guild;
+
+                if (guildId == 0)
+                    guild = Context.Guild;
+                else
+                    guild = Global.Client.GetGuild(guildId);
+
+                var userAccounts = UserAccounts.GetOrAddUserAccountsForGuild(guild.Id);
+                var orderedByLvlUsers = userAccounts.OrderByDescending(acc => acc.Lvl).ToList();
+
+                var guildAccount = ServerAccounts.GetServerAccount(guild);
+                var orderedByChannels =
+                    guildAccount.MessagesReceivedStatisctic.OrderByDescending(chan => chan.Value).ToList();
+
+
+                var aliveUserCount = 0;
+                var activeUserCount = 0;
+                foreach (var t in userAccounts)
+                {
+                    if (t.Lvl > 2)
+                        aliveUserCount++;
+                    if (t.Lvl > 20)
+                        activeUserCount++;
+                }
+
+                var adminCount = 0;
+                var moderCount = 0;
+                foreach (var t in userAccounts)
+                {
+                    var acc = guild.GetUser(t.Id);
+                    if (acc == null)
+                        continue;
+                    if (acc.GuildPermissions.Administrator && !acc.IsBot)
+                        adminCount++;
+                    if (acc.GuildPermissions.DeafenMembers && acc.GuildPermissions.ManageMessages
+                                                           && acc.GuildPermissions.ManageChannels && !acc.IsBot)
+                        moderCount++;
+                }
+
+                var rolesList = guild.Roles.ToList();
+                var orderedRoleList = rolesList.OrderByDescending(rl => rl.Members.Count()).ToList();
+
+                var embed = new EmbedBuilder();
+                embed.WithColor(Color.Blue);
+                embed.WithAuthor(Context.User);
+                embed.AddField($"{guild.Name} Statistic", $"**Created:** {Context.Guild.CreatedAt}\n" +
+                                                          $"**Owner:** {Context.Guild.Owner}\n" +
+                                                          $"**Verification Level:** {Context.Guild?.VerificationLevel}\n" +
+                                                          $"**Users:** {Context.Guild.MemberCount}\n" +
+                                                          $"**Alive Users:** {aliveUserCount}\n" +
+                                                          $"**Active Users:** {activeUserCount}\n" +
+                                                          $"**Admins:** {adminCount}\n" +
+                                                          $"**Moderators:** {moderCount}\n");
+                if(orderedByLvlUsers.Count >= 3 && orderedByChannels.Count >= 4 && orderedRoleList.Count >= 5) {
+                    embed.AddField("**______**", "**Top 3 Active users:**\n" +
+                                                 $"{Context.Guild.GetUser(orderedByLvlUsers[0].Id).Mention} - {Math.Round(orderedByLvlUsers[0].Lvl, 2)} LVL\n" +
+                                                 $"{Context.Guild.GetUser(orderedByLvlUsers[1].Id).Mention} - {Math.Round(orderedByLvlUsers[1].Lvl, 2)} LVL\n" +
+                                                 $"{Context.Guild.GetUser(orderedByLvlUsers[2].Id).Mention} - {Math.Round(orderedByLvlUsers[2].Lvl, 2)} LVL\n" +
+                                                 "(to see all - say `top`)\n" +
+                                                 "(to see a user statistic say `stats @user`\n\n" +
+                                                 "**Top 4 Channels:**\n" +
+                                                 $"{Context.Guild.GetTextChannel(Convert.ToUInt64(orderedByChannels[0].Key)).Mention} - {orderedByChannels[0].Value} Messages\n" +
+                                                 $"{Context.Guild.GetTextChannel(Convert.ToUInt64(orderedByChannels[1].Key)).Mention} Messages\n" +
+                                                 $"{Context.Guild.GetTextChannel(Convert.ToUInt64(orderedByChannels[2].Key)).Mention} Messages\n" +
+                                                 $"{Context.Guild.GetTextChannel(Convert.ToUInt64(orderedByChannels[3].Key)).Mention} Messages\n" +
+                                                 $"All Messages: {guildAccount.MessagesReceivedAll}\n" +
+                                                 "(to see all - say `topChan`)\n\n" +
+                                                 "**Top 4 Roles:**\n" +
+                                                 $"{orderedRoleList[1]?.Mention} - {orderedRoleList[1]?.Members.Count()} Members\n" +
+                                                 $"{orderedRoleList[2]?.Mention} - {orderedRoleList[2]?.Members.Count()} Members\n" +
+                                                 $"{orderedRoleList[3]?.Mention} - {orderedRoleList[3]?.Members.Count()} Members\n" +
+                                                 $"{orderedRoleList[4]?.Mention} - {orderedRoleList[4]?.Members.Count()} Members\n" +
+                                                 "(to see all - say `topRoles`");
+                }
+                else
+                {
+                    await ReplyAsync("**ERROR**\n" +
+                                     "Not everything is displayed:\n" +
+                                     "You need to have at least 3 users, 4 channels with messages and 4 roles to be able to use this command correctly");
+                }
+                embed.AddField("**______**", $"**Text Channels Count:** {Context.Guild?.TextChannels.Count}\n" +
+                                             $"**Voice Channels Count:** {Context.Guild?.VoiceChannels.Count}\n" +
+                                             $"**All Channels and Category Count:** {Context.Guild?.Channels.Count}\n" +
+                                             $"**Roles Count:** {Context.Guild.Roles?.Count}\n" +
+                                             $"**AFK Channel:** {Context.Guild?.AFKChannel} ({Context.Guild?.AFKTimeout} Timeout)\n");
+                embed.WithThumbnailUrl(guild.IconUrl);
+                embed.WithCurrentTimestamp();
+
+
+                await CommandHandeling.ReplyAsync(Context, embed);
+            }
+            catch 
+            {
+             //   Console.WriteLine(e.Message);
+            }
+        }
+
     }
 }

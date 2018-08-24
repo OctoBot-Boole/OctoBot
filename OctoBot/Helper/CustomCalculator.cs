@@ -1,11 +1,17 @@
-﻿using System.Collections.Generic;
+﻿/*using System.Collections.Generic;
 
 namespace OctoBot.Helper
 {
     public class CustomCalculator
     {
+        private readonly SecureRandom _secureRandom;
+
+        public CustomCalculator(SecureRandom secureRandom)
+        {
+            _secureRandom = secureRandom;
+        }
         //Calculator for Dice Roll, Can handle (2d4 + 4d2 + 100 + 1d4) ort simple A*B or A/B
-        public static (int, string ) Calculator(int times, int num, char sign)
+        public (int, string ) Calculator(int times, int num, char sign)
         {
             switch (sign)
             {
@@ -29,14 +35,14 @@ namespace OctoBot.Helper
                     if (times <= 0 || num <= 0)
                         return (0, "error");
                     if (times == 1)
-                        return (SecureRandom.Random(1, num), "");
+                        return (_secureRandom.Random(1, num), "");
 
                     var resultString = "";
                     if (times <= 1000 && num <= 120)
                     {
                         for (var i = 0; i < times; i++)
                         {
-                            var lol = SecureRandom.Random(1, num);
+                            var lol = _secureRandom.Random(1, num);
                             result.Add(lol);
                         }
 
@@ -55,4 +61,4 @@ namespace OctoBot.Helper
             return (0, "error");
         }
     }
-}
+}*/

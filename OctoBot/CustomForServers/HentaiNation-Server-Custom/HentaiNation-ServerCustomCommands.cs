@@ -6,7 +6,7 @@ using OctoBot.Custom_Library;
 
 namespace OctoBot.CustomForServers
 {
-    public class ServerCustomCommands : ModuleBase<SocketCommandContextCustom>
+    public class ServerCustomCommands : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("HentaiWelcomeMess")]
         [RequireOwner]

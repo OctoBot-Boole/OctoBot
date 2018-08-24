@@ -37,6 +37,8 @@ namespace OctoBot.CustomForServers
                     var pekaohmy = Emote.Parse("<:pekaohmy:374656330742497280>");
                     var warframe = Emote.Parse("<:warframe:445467639242948618>");
                     var nintendoswitch = Emote.Parse("<:nintendoswitch:447209808064413707>");
+                    var fps = Emote.Parse("<:fuckyeah:430853466408353792>");
+                    var sir = Emote.Parse("<:sir:430853466110427137>");
 
                     await cash.GetOrDownloadAsync().Result.RemoveAllReactionsAsync();
                     await cash.GetOrDownloadAsync().Result.AddReactionAsync(rkn);
@@ -54,7 +56,9 @@ namespace OctoBot.CustomForServers
                     await cash.GetOrDownloadAsync().Result.AddReactionAsync(gacHiPride);
                     await cash.GetOrDownloadAsync().Result.AddReactionAsync(warframe);
                     await cash.GetOrDownloadAsync().Result.AddReactionAsync(nintendoswitch);
+                    await cash.GetOrDownloadAsync().Result.AddReactionAsync(fps);
                     await cash.GetOrDownloadAsync().Result.AddReactionAsync(pekaohmy);
+                    await cash.GetOrDownloadAsync().Result.AddReactionAsync(sir);
                 }
                 else if (editCheck == 3)
                 {
@@ -305,9 +309,13 @@ namespace OctoBot.CustomForServers
                             await guildUser.AddRoleAsync(roleToGive);
                             break;
                         }
-                        case "pekaohmy" when reaction.UserId == 181514288278536193:
+                        case "pekaohmy":
                         {
-                            var k = RemoveReactions(cash, channel, reaction, 2, globalAccount);
+                            var guildUser =
+                                Global.Client.GetGuild(338355570669256705).GetUser(reaction.UserId) as IGuildUser;
+                            if(!guildUser.GuildPermissions.ManageMessages && !guildUser.GuildPermissions.ManageMessages && !guildUser.GuildPermissions.MuteMembers)
+                                return;
+                            var k =RemoveReactions(cash, channel, reaction, 2, globalAccount);
                             break;
                         }
                         case "warframe":
@@ -326,15 +334,49 @@ namespace OctoBot.CustomForServers
 
                             await guildUser.AddRoleAsync(roleToGive);
                             break;
-                        }
+                        } //fuckyeah
                         case "nintendoswitch":
                         {
                             var guildUser = Global.Client.GetGuild(338355570669256705).GetUser(reaction.UserId);
                             var roleToGive = Global.Client.GetGuild(338355570669256705).Roles
-                                .SingleOrDefault(x => x.Name.ToString() == "switcher");
+                                .SingleOrDefault(x => x.Name.ToString() == "nintendofag");
 
                             var roleList = guildUser.Roles.ToArray();
-                            if (roleList.Any(t => t.Name == "switcher"))
+                            if (roleList.Any(t => t.Name == "nintendofag"))
+                            {
+                                await guildUser.RemoveRoleAsync(roleToGive);
+                                var k = RemoveReactions(cash, channel, reaction, 1, globalAccount);
+                                return;
+                            }
+
+                            await guildUser.AddRoleAsync(roleToGive);
+                            break;
+                        }
+                        case "fuckyeah":
+                        {
+                            var guildUser = Global.Client.GetGuild(338355570669256705).GetUser(reaction.UserId);
+                            var roleToGive = Global.Client.GetGuild(338355570669256705).Roles
+                                .SingleOrDefault(x => x.Name.ToString() == "fps");
+
+                            var roleList = guildUser.Roles.ToArray();
+                            if (roleList.Any(t => t.Name == "fps"))
+                            {
+                                await guildUser.RemoveRoleAsync(roleToGive);
+                                var k = RemoveReactions(cash, channel, reaction, 1, globalAccount);
+                                return;
+                            }
+
+                            await guildUser.AddRoleAsync(roleToGive);
+                            break;
+                        }
+                        case "sir":
+                        {
+                            var guildUser = Global.Client.GetGuild(338355570669256705).GetUser(reaction.UserId);
+                            var roleToGive = Global.Client.GetGuild(338355570669256705).Roles
+                                .SingleOrDefault(x => x.Name.ToString() == "Strategy");
+
+                            var roleList = guildUser.Roles.ToArray();
+                            if (roleList.Any(t => t.Name == "Strategy"))
                             {
                                 await guildUser.RemoveRoleAsync(roleToGive);
                                 var k = RemoveReactions(cash, channel, reaction, 1, globalAccount);

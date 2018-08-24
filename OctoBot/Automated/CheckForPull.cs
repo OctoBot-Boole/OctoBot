@@ -101,9 +101,9 @@ namespace OctoBot.Automated
 
                                 do
                                 {
-                                    randonKey1 = SecureRandom.Random(0, fullKeysNameList.Length);
-                                    randonKey2 = SecureRandom.Random(0, fullKeysNameList.Length);
-                                    randonKey3 = SecureRandom.Random(0, fullKeysNameList.Length);
+                                    randonKey1 = SecureRandomStatic.Random(0, fullKeysNameList.Length);
+                                    randonKey2 = SecureRandomStatic.Random(0, fullKeysNameList.Length);
+                                    randonKey3 = SecureRandomStatic.Random(0, fullKeysNameList.Length);
                                 } while (randonKey1 == randonKey2 || randonKey2 == randonKey3 ||
                                          randonKey1 == randonKey3);
 

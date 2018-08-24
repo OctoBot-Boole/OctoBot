@@ -21,10 +21,10 @@ namespace OctoBot.Automated
 #pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
 
 
-        public readonly DiscordSocketClient Client;
+        public readonly DiscordShardedClient Client;
         public readonly IServiceProvider Services;
 
-        public ServerActivityLogger(DiscordSocketClient client, IServiceProvider services)
+        public ServerActivityLogger(DiscordShardedClient client, IServiceProvider services)
         {
             Client = client;
             Services = services;
@@ -235,7 +235,7 @@ namespace OctoBot.Automated
                                                                $"NSFW: {channel.IsNsfw}\n" +
                                                                $"Category: {channel.GetCategoryAsync()?.Result?.Name}\n" +
                                                                $"ID: {arg.Id}\n");
-                        embed.WithTimestamp(DateTimeOffset.UtcNow);
+                        embed.WithCurrentTimestamp();
                         embed.WithThumbnailUrl($"{audit[0].User.GetAvatarUrl()}");
                     }
 
@@ -248,7 +248,7 @@ namespace OctoBot.Automated
                                                                      $"Created: {voiceChannel.CreatedAt.DateTime}\n" +
                                                                      $"Position: {voiceChannel.Position}" +
                                                                      $"ID: {arg.Id}\n");
-                        embed.WithTimestamp(DateTimeOffset.UtcNow);
+                        embed.WithCurrentTimestamp();
                     }
 
                     await Client.GetGuild(guild.ServerId).GetTextChannel(guild.LogChannelId)
@@ -300,7 +300,7 @@ namespace OctoBot.Automated
                                                          $"NSFW: {channel.IsNsfw}\n" +
                                                          $"Category: {channel.GetCategoryAsync().Result.Name}\n" +
                                                          $"ID: {arg.Id}\n");
-                    embed.WithTimestamp(DateTimeOffset.UtcNow);
+                    embed.WithCurrentTimestamp();
                     embed.WithThumbnailUrl($"{audit[0].User.GetAvatarUrl()}");
 
                     await Client.GetGuild(guild.ServerId).GetTextChannel(guild.LogChannelId)
@@ -334,7 +334,7 @@ namespace OctoBot.Automated
                                                          $"Limit: {voiceChannel.UserLimit}\n" +
                                                          $"Category: {voiceChannel.GetCategoryAsync().Result.Name}\n" +
                                                          $"ID: {arg.Id}\n");
-                    embed.WithTimestamp(DateTimeOffset.UtcNow);
+                    embed.WithCurrentTimestamp();
                     embed.WithThumbnailUrl($"{audit[0].User.GetAvatarUrl()}");
                     await Client.GetGuild(guild.ServerId).GetTextChannel(guild.LogChannelId)
                         .SendMessageAsync("", false, embed.Build());
@@ -381,7 +381,7 @@ namespace OctoBot.Automated
                     var afterName = after.Nickname ?? after.Username;
 
                     embed.WithColor(255, 255, 0);
-                    embed.WithTimestamp(DateTimeOffset.UtcNow);
+                    embed.WithCurrentTimestamp();
                     embed.AddField("💢 Nickname Changed:",
                         $"User: **{before.Username} {before.Id}**\n" +
                         $"Server: **{before.Guild.Name}**\n" +
@@ -422,7 +422,7 @@ namespace OctoBot.Automated
                 if (before.GetAvatarUrl() != after.GetAvatarUrl())
                 {
                     embed.WithColor(255, 255, 0);
-                    embed.WithTimestamp(DateTimeOffset.UtcNow);
+                    embed.WithCurrentTimestamp();
                     embed.AddField("💢 Avatar Changed:",
                         $"User: **{before.Username} {before.Id}**\n" +
                         $"Server: **{before.Guild.Name}**\n" +
@@ -439,7 +439,7 @@ namespace OctoBot.Automated
                 if (before.Username != after.Username || before.Id != after.Id)
                 {
                     embed.WithColor(255, 255, 0);
-                    embed.WithTimestamp(DateTimeOffset.UtcNow);
+                    embed.WithCurrentTimestamp();
                     embed.AddField("💢 USERNAME Changed:",
                         $"Server: **{before.Guild.Name}**\n" +
                         "Before:\n" +
@@ -482,7 +482,7 @@ namespace OctoBot.Automated
                     var audit = log.ToList();
 
                     embed.WithColor(255, 255, 0);
-                    embed.WithTimestamp(DateTimeOffset.UtcNow);
+                    embed.WithCurrentTimestamp();
                     embed.AddField($"👑 Role Update (Role {roleString}):",
                         $"User: **{before.Username} {before.Id}**\n" +
                         $"Server: **{before.Guild.Name}**\n" +
@@ -517,7 +517,7 @@ namespace OctoBot.Automated
 
                 var embed = new EmbedBuilder();
                 await Client.GetGuild(375104801018609665).GetTextChannel(460612886188916736).SendMessageAsync(
-                    $"<@181514288278536193> OctoBot have been connected to {arg.Name}");
+                    $"<@181514288278536193> OctoBot have been connected to {arg.Name}({arg.MemberCount}) - {arg.Id}");
 
                 embed.WithColor(Color.Blue);
                 embed.WithFooter("Boole.");
@@ -584,7 +584,7 @@ namespace OctoBot.Automated
             await commands.AddModulesAsync(
                 Assembly.GetEntryAssembly(),
                 Services);
-            var tempTask = new CommandHandelingSendingAndUpdatingMessages(Services, commands, Client);
+            var tempTask = new CommandHandeling(Services, commands, Client);
             await tempTask.HandleCommandAsync(messageAfter);
         }
 
@@ -598,6 +598,9 @@ namespace OctoBot.Automated
                 var after = messageAfter as IUserMessage;
                 var octoBot = currentIGuildChannel.GetUserAsync(Global.Client.CurrentUser.Id);
                 var guild = ServerAccounts.GetServerAccount(currentIGuildChannel);
+
+               // if(messageAfter.Content.ToArray().Except(messageBefore.Value.Content.ToArray()).Count() < guild.LoggingMessEditIgnoreChar)
+               //     return;
 
                 var ss = 0;
                 foreach (var t in Global.CommandList)
@@ -633,7 +636,7 @@ namespace OctoBot.Automated
                 embed.WithColor(Color.Green);
                 embed.WithFooter($"MessId: {messageBefore.Id}");
                 embed.WithThumbnailUrl($"{messageBefore.Value.Author.GetAvatarUrl()}");
-                embed.WithTimestamp(DateTimeOffset.UtcNow);
+                embed.WithCurrentTimestamp();
                 embed.WithTitle("📝 Updated Message");
                 embed.WithDescription($"Where: <#{before.Channel.Id}>" +
                                       $"\nMess Author: **{after?.Author}**\n");
@@ -767,6 +770,7 @@ namespace OctoBot.Automated
         {
             try
             {
+
                 if (messageBefore.Value == null)
                     return;
 
@@ -1004,7 +1008,7 @@ namespace OctoBot.Automated
                                                                   $"Guild: {before.Guild.Name}\n" +
                                                                   $"{extra}" +
                                                                   $"Permission ({roleString}): **{role}**");
-                embed.WithTimestamp(DateTimeOffset.UtcNow);
+                embed.WithCurrentTimestamp();
                 embed.WithThumbnailUrl($"{audit[0].User.GetAvatarUrl()}");
 
 
@@ -1095,7 +1099,7 @@ namespace OctoBot.Automated
                         embed.AddField("Before:", textBefore);
                         embed.AddField("After", textAfter);
 
-                        embed.WithTimestamp(DateTimeOffset.UtcNow);
+                        embed.WithCurrentTimestamp();
                     }
 
 
@@ -1143,7 +1147,7 @@ namespace OctoBot.Automated
                         embed.AddField("Before:", textBefore);
                         embed.AddField("After", textAfter);
 
-                        embed.WithTimestamp(DateTimeOffset.UtcNow);
+                        embed.WithCurrentTimestamp();
                     }
 
                     await Client.GetGuild(guild.ServerId).GetTextChannel(guild.LogChannelId)
@@ -1191,7 +1195,7 @@ namespace OctoBot.Automated
                                                   $"Name: {arg.Name} ({arg.Guild})\n" +
                                                   $"Color: {arg.Color}\n" +
                                                   $"ID: {arg.Id}\n");
-                embed.WithTimestamp(DateTimeOffset.UtcNow);
+                embed.WithCurrentTimestamp();
                 embed.WithThumbnailUrl($"{audit[0].User.GetAvatarUrl()}");
 
 

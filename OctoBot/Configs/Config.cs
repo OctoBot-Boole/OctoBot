@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
@@ -7,9 +10,9 @@ using Newtonsoft.Json;
 
 namespace OctoBot.Configs
 {
-    internal class Global
+    public class Global
     {
-        internal static DiscordSocketClient Client { get; set; }
+        internal static DiscordShardedClient Client { get; set; }
 
 
         internal static ulong YellowTurlteChannelId { get; set; }
@@ -115,6 +118,21 @@ namespace OctoBot.Configs
                 BotSocketMsg = botSocketMsg;
             }
         }
+
+        public static async Task<string> SendWebRequest(string requestUrl)
+        {
+            using (var client = new HttpClient(new HttpClientHandler()))
+            {
+                client.DefaultRequestHeaders.Add("User-Agent", "OctoBot");
+                using (var response = await client.GetAsync(requestUrl))
+                {
+                    if (response.StatusCode != HttpStatusCode.OK)
+                        return response.StatusCode.ToString();
+                    return await response.Content.ReadAsStringAsync();
+                }
+            }
+        }
+
     }
 
     internal class Config
@@ -133,4 +151,7 @@ namespace OctoBot.Configs
         public string Token;
         public string DbLtoken;
     }
+
+
+
 }

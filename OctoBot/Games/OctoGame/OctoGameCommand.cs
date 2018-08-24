@@ -14,7 +14,7 @@ using OctoBot.Helper;
 
 namespace OctoBot.Games.OctoGame
 {
-    public class OctoGameCommand : ModuleBase<SocketCommandContextCustom>
+    public class OctoGameCommand : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("CreateOcto", RunMode = RunMode.Async)]
         [Alias("UpdateOcto", "OctoCreate")]
@@ -101,7 +101,7 @@ namespace OctoBot.Games.OctoGame
             embed.AddField($"Твой осьминожка!",
                 $"**Имя:** {octoInfoArray[0]}\n**Цвет:** {octoInfoArray[1]}\n**Характер** {octoInfoArray[2]}\n**Лор:** {octoInfoArray[3]}");
 
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+            await CommandHandeling.ReplyAsync(Context, embed);
         }
 
         [Command("endGame")]
@@ -220,7 +220,7 @@ namespace OctoBot.Games.OctoGame
             var embed = new EmbedBuilder();
             embed.AddField("Введи Номер дерева скилла, у тебя 5 минута", "1 - AD\n2 - DEF\n3 - AGI\n4 - AP");
 
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+            await CommandHandeling.ReplyAsync(Context, embed);
 
 
             response = await AwaitForUserMessage.AwaitMessage(Context.User.Id, Context.Channel.Id, 300000);

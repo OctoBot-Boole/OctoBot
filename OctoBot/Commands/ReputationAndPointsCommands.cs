@@ -11,7 +11,7 @@ using OctoBot.Helper;
 
 namespace OctoBot.Commands
 {
-    public class ReputationAndPointsCommands : ModuleBase<SocketCommandContextCustom>
+    public class ReputationAndPointsCommands : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("OctoRep")]
         [Alias("Octo Rep", "Rep", "октоРепа", "Окто Репа", "Репа")]
@@ -26,12 +26,12 @@ namespace OctoBot.Commands
                 account.Rep += rep;
                 UserAccounts.SaveAccounts(Context.Guild.Id);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                await CommandHandeling.ReplyAsync(Context,
                     $"{rep} Octo Reputation were credited, altogether {user.Mention} have {account.Rep} Octo Reputation!");
             }
             else
             {
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                await CommandHandeling.ReplyAsync(Context,
                     "Boole! You do not have a tolerance of this level!");
             }
         }
@@ -49,12 +49,12 @@ namespace OctoBot.Commands
                 account.Points += points;
                 UserAccounts.SaveAccounts(Context.Guild.Id);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                await CommandHandeling.ReplyAsync(Context,
                     $"{points} Octo Points were credited, altogether {user.Mention} have {account.Points} Octo Points!");
             }
             else
             {
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                await CommandHandeling.ReplyAsync(Context,
                     "Boole! You do not have a tolerance of this level!");
             }
         }
@@ -81,12 +81,12 @@ namespace OctoBot.Commands
                         account.Points -= cost;
                         UserAccounts.SaveAccounts(Context.Guild.Id);
 
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                        await CommandHandeling.ReplyAsync(Context,
                             $"Booole! You've Got Access **#{account.OctoPass}**");
                     }
                     else
                     {
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                        await CommandHandeling.ReplyAsync(Context,
                             "You should say `yes` или `Yes` in 6s to get the pass.");
                     }
                 }
@@ -120,7 +120,7 @@ namespace OctoBot.Commands
                 {
                     if (points <= 0)
                     {
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                        await CommandHandeling.ReplyAsync(Context,
                             "You cannot send 0 or -number, boo!");
                         return;
                     }
@@ -139,18 +139,18 @@ namespace OctoBot.Commands
                         bot.Points += (int) toBank;
                         UserAccounts.SaveAccounts(Context.Guild.Id);
 
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                        await CommandHandeling.ReplyAsync(Context,
                             $"Was transferred{points}\n {user.Mention} now have {account.Points} Octo Points!\nyou have left {passCheck.Points}\ntaxes: {taxes}");
                     }
                     else
                     {
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                        await CommandHandeling.ReplyAsync(Context,
                             $"You do not have enough Octo Points to pass them.");
                     }
                 }
                 else
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! You do not have a tolerance of this level!");
                 }
             }

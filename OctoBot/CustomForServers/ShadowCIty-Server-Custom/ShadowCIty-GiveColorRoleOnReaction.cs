@@ -229,8 +229,12 @@ namespace OctoBot.CustomForServers
 
                             break;
                         }
-                        case "pekaohmy" when reaction.UserId == 181514288278536193:
+                        case "pekaohmy":
                         {
+                            var guildUser =
+                                Global.Client.GetGuild(338355570669256705).GetUser(reaction.UserId) as IGuildUser;
+                            if(!guildUser.GuildPermissions.ManageMessages && !guildUser.GuildPermissions.ManageMessages && !guildUser.GuildPermissions.MuteMembers)
+                                return;
                             var k = RoomRoleReaction.RemoveReactions(cash, channel, reaction, 3, globalAccount);
                             break;
                         }

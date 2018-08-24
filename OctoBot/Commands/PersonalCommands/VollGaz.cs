@@ -7,7 +7,7 @@ using OctoBot.Handeling;
 
 namespace OctoBot.Commands.PersonalCommands
 {
-    public class VollGaz : ModuleBase<SocketCommandContextCustom>
+    public class VollGaz : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("Miserum")]
         public async Task Miserum()
@@ -43,14 +43,14 @@ namespace OctoBot.Commands.PersonalCommands
                 embed.WithAuthor("MISERUM!");
                 embed.WithImageUrl("" + memeToPost);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             else
             {
                 var embed = new EmbedBuilder();
                 embed.WithImageUrl("https://i.imgur.com/wt8EN8R.jpg");
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
         }
 
@@ -74,14 +74,14 @@ namespace OctoBot.Commands.PersonalCommands
                 embed.WithAuthor("Фистурион Одобряет");
                 embed.WithImageUrl("" + url);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             else
             {
                 var embed = new EmbedBuilder();
                 embed.WithImageUrl("https://i.imgur.com/wt8EN8R.jpg");
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
         }
 
@@ -103,14 +103,14 @@ namespace OctoBot.Commands.PersonalCommands
 
                 embed.WithImageUrl("" + url);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             else
             {
                 var embed = new EmbedBuilder();
                 embed.WithImageUrl("https://i.imgur.com/wt8EN8R.jpg");
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
         }
 
@@ -132,14 +132,14 @@ namespace OctoBot.Commands.PersonalCommands
                 embed.WithAuthor("Oh yea");
                 embed.WithImageUrl("" + url);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             else
             {
                 var embed = new EmbedBuilder();
                 embed.WithImageUrl("https://i.imgur.com/wt8EN8R.jpg");
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
         }
 
@@ -159,7 +159,7 @@ namespace OctoBot.Commands.PersonalCommands
             embed.WithAuthor("INCREDIBLIS");
             embed.WithImageUrl("" + url);
 
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+            await CommandHandeling.ReplyAsync(Context, embed);
         }
     }
 }

@@ -8,7 +8,7 @@ using OctoBot.Handeling;
 
 namespace OctoBot.Commands
 {
-    public class OctoGift : ModuleBase<SocketCommandContextCustom>
+    public class OctoGift : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("GiftCooki")]
         [Alias("Gift Cooki", "подаритьКуки", "Подарить Куки")]
@@ -43,7 +43,7 @@ namespace OctoBot.Commands
                     embed.WithImageUrl("https://i.imgur.com/dCJwloV.jpg");
 
 
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                    await CommandHandeling.ReplyAsync(Context, embed);
                 }
                 else
                 {
@@ -90,7 +90,7 @@ namespace OctoBot.Commands
                     embed.WithImageUrl("https://i.imgur.com/xxE7EeX.jpg");
 
 
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                    await CommandHandeling.ReplyAsync(Context, embed);
                 }
                 else
                 {
@@ -138,7 +138,7 @@ namespace OctoBot.Commands
                     embed.WithImageUrl("https://i.imgur.com/Ufky6UB.jpg");
 
 
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                    await CommandHandeling.ReplyAsync(Context, embed);
                 }
                 else
                 {
@@ -167,7 +167,7 @@ namespace OctoBot.Commands
                 embed.AddField("**Pinki~**", "`GiftPinki [user]` cost: **1488** ОктоПоинтов");
                 embed.AddField("**Rainbow** :gay_pride_flag:", "`GiftRainbow [user]` cost: **1488** Octo Points");
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             catch
             {

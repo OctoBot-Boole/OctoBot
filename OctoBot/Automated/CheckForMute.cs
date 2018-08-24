@@ -28,8 +28,9 @@ namespace OctoBot.Automated
         }
 
         public static async void ChekAllMutes(object sender, ElapsedEventArgs e)
-        
+
         {
+            return;
             try
             {
                 var allUserAccounts = UserAccounts.GetOrAddUserAccountsForGuild(0);

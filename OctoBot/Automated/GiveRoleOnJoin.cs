@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using OctoBot.Configs.Server;
@@ -19,7 +18,7 @@ namespace OctoBot.Automated
                 return;
 
             var roleToGive = arg.Guild.Roles
-                .SingleOrDefault(x => x.Name.ToString() == $"{guid.RoleOnJoin}");
+                .SingleOrDefault(x => x.Name.ToString().ToLower() == $"{guid.RoleOnJoin.ToLower()}");
 
             await arg.AddRoleAsync(roleToGive);
         }

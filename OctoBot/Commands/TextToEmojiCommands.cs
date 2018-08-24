@@ -9,7 +9,7 @@ using OctoBot.Handeling;
 
 namespace OctoBot.Commands
 {
-    public class TextToEmojiCommands : ModuleBase<SocketCommandContextCustom>
+    public class TextToEmojiCommands : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("Emotify")]
         [Alias("emoji", "emotion", "emo")]
@@ -36,7 +36,7 @@ namespace OctoBot.Commands
                         else convertedText += $"{c}";
                         break;
                 }
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+            await CommandHandeling.ReplyAsync(Context,
                 $"{convertedText}");
         }
 

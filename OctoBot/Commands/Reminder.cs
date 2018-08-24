@@ -13,12 +13,11 @@ using static OctoBot.Configs.Users.AccountSettings;
 
 namespace OctoBot.Commands
 {
-    public class ReminderFormat
-    {
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 #pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
 
-     
+    public class ReminderFormat
+    {
         public static string[] Formats =
         {
             // Used to parse stuff like 1d14h2m11s and 1d 14h 2m 11s could add/remove more if needed
@@ -46,9 +45,14 @@ namespace OctoBot.Commands
     }
 
 
-    public class Reminder : ModuleBase<SocketCommandContextCustom>
+    public class Reminder : ModuleBase<ShardedCommandContextCustom>
     {
+        private readonly SecureRandom _secureRandom;
 
+        public Reminder(SecureRandom secureRandom)
+        {
+            _secureRandom = secureRandom;
+        }
 
         [Command("Remind", RunMode = RunMode.Async)]
         [Priority(1)]
@@ -58,23 +62,13 @@ namespace OctoBot.Commands
         {
             try
             {    
-                /*
-                if (!await HasVoted(Context.User.Id))
-                {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
-                        "Boole-Boole. To use this command, you have to vote here: <https://discordbots.org/bot/423593006436712458>\n" +
-                        $"Please, wait for 2-5 minutes after the vote. Thank you boole!\n" +
-                        $"{new Emoji("<:octo_hi:465374417644552192>")}");
-                    return;
-                }*/
-
                 string[] splittedArgs = { };
-                if (args.Contains("  in ")) splittedArgs = args.Split(new[] {"  in "}, StringSplitOptions.None);
-                else if (args.Contains(" in  ")) splittedArgs = args.Split(new[] {" in  "}, StringSplitOptions.None);
-                else if (args.Contains("  in  ")) splittedArgs = args.Split(new[] {"  in  "}, StringSplitOptions.None);
-                else if (args.Contains(" in ")) splittedArgs = args.Split(new[] {" in "}, StringSplitOptions.None);
+                if (args.ToLower().Contains("  in ")) splittedArgs = args.ToLower().Split(new[] {"  in "}, StringSplitOptions.None);
+                else if (args.ToLower().Contains(" in  ")) splittedArgs = args.ToLower().Split(new[] {" in  "}, StringSplitOptions.None);
+                else if (args.ToLower().Contains("  in  ")) splittedArgs = args.ToLower().Split(new[] {"  in  "}, StringSplitOptions.None);
+                else if (args.ToLower().Contains(" in ")) splittedArgs = args.ToLower().Split(new[] {" in "}, StringSplitOptions.None);
 
-
+                
                 if (splittedArgs == null)
                 {
                     const string bigmess = "boole-boole... you are using this command incorrectly!!\n" +
@@ -82,9 +76,15 @@ namespace OctoBot.Commands
                                            "Between message and time **HAVE TO BE** written `in` part" +
                                            "(Time can be different, but follow the rules! **day-hour-minute-second**. You can skip any of those parts, but they have to be in the same order. One space or without it between each of the parts\n" +
                                            "I'm a loving order octopus!";
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, bigmess);
+                    await CommandHandeling.ReplyAsync(Context, bigmess);
                     return;
                 }
+                var account = UserAccounts.GetAccount(Context.User, 0);
+                var accountForTimeZone = UserAccounts.GetAccount(Context.User, Context.Guild.Id);
+                
+                var timezone = accountForTimeZone.TimeZone ?? "UTC";
+
+                TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById($"{timezone}");
 
 
                 var timeString = splittedArgs[splittedArgs.Length-1];
@@ -95,34 +95,36 @@ namespace OctoBot.Commands
 
                 var timeDateTime = DateTime.UtcNow +
                                    TimeSpan.ParseExact(timeString, ReminderFormat.Formats, CultureInfo.CurrentCulture);
-                var randomIndex = SecureRandom.Random(0, OctoNamePull.OctoNameRu.Length);
+                var randomIndex = _secureRandom.Random(0, OctoNamePull.OctoNameRu.Length-1);
                 var randomOcto = OctoNamePull.OctoNameRu[randomIndex];
 
                 var extra = randomOcto.Split(new[] {"]("}, StringSplitOptions.RemoveEmptyEntries);
                 var name = extra[0].Remove(0, 1);
                 var url = extra[1].Remove(extra[1].Length - 1, 1);
 
+
+                var localTime = TimeZoneInfo.ConvertTimeFromUtc(timeDateTime, tz);
+
                 var bigmess2 =
                     $"{reminderString}\n\n" +
-                    $"We will send you a DM in  __**{timeDateTime}**__ `by UTC`\n" +
-                    $"**Time Now:                               {DateTime.UtcNow}** `by UTC`";
+                    $"We will send you a DM in  __**{localTime}**__ `by {timezone}`\n";
                 var embed = new EmbedBuilder();
                 embed.WithAuthor(Context.User);
-                embed.WithTimestamp(DateTimeOffset.UtcNow);
-                embed.WithColor(SecureRandom.Random(0, 255), SecureRandom.Random(0, 255),
-                    SecureRandom.Random(0, 255));
+                embed.WithCurrentTimestamp();
+                embed.WithColor(_secureRandom.Random(0, 254), _secureRandom.Random(0, 254),
+                    _secureRandom.Random(0, 254));
                 embed.AddField($"**____**", $"{bigmess2}");
                 embed.WithTitle($"{name} напомнит тебе:");
                 embed.WithUrl(url);
 
-                var account = UserAccounts.GetAccount(Context.User, 0);
+                
                 var newReminder = new CreateReminder(timeDateTime, reminderString);
 
                 account.ReminderList.Add(newReminder);
                 UserAccounts.SaveAccounts(0);
 
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             catch (Exception e)
             {
@@ -142,19 +144,9 @@ namespace OctoBot.Commands
         {
             try
             {
-             /*
-                if (!await HasVoted(Context.User.Id))
-                {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
-                        "Boole-Boole. To use this command, you have to vote here: <https://discordbots.org/bot/423593006436712458>\n" +
-                        $"Please, wait for 2-5 minutes after the vote. Thank you boole!\n" +
-                        $"{new Emoji("<:octo_hi:465374417644552192>")}");
-                    return;
-                }
-                */
                 if (minute > 1439)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Booole. [time] have to be in range 0-1439 (in minutes)");
 
 
@@ -178,7 +170,7 @@ namespace OctoBot.Commands
                 var timeDateTime = DateTime.UtcNow +
                                    TimeSpan.ParseExact(timeString, ReminderFormat.Formats, CultureInfo.CurrentCulture);
 
-                var randomIndex = SecureRandom.Random(0, OctoNamePull.OctoNameRu.Length);
+                var randomIndex = _secureRandom.Random(0, OctoNamePull.OctoNameRu.Length-1);
                 var randomOcto = OctoNamePull.OctoNameRu[randomIndex];
                 var extra = randomOcto.Split(new[] {"]("}, StringSplitOptions.RemoveEmptyEntries);
                 var name = extra[0].Remove(0, 1);
@@ -191,14 +183,14 @@ namespace OctoBot.Commands
 
                 var embed = new EmbedBuilder();
                 embed.WithAuthor(Context.User);
-                embed.WithTimestamp(DateTimeOffset.UtcNow);
-                embed.WithColor(SecureRandom.Random(0, 255), SecureRandom.Random(0, 255),
-                    SecureRandom.Random(0, 255));
+                embed.WithCurrentTimestamp();
+                embed.WithColor(_secureRandom.Random(0, 255), _secureRandom.Random(0, 255),
+                    _secureRandom.Random(0, 255));
                 embed.AddField($"**____**", $"{bigmess}");
                 embed.WithTitle($"{name} напомнит тебе:");
                 embed.WithUrl(url);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
 
 
                 var account = UserAccounts.GetAccount(Context.User, 0);
@@ -225,21 +217,12 @@ namespace OctoBot.Commands
         {
             try
             {
-                /*
-                if (!await HasVoted(Context.User.Id))
-                {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
-                        "Boole-Boole. To use this command, you have to vote here: <https://discordbots.org/bot/423593006436712458>\n" +
-                        $"Please, wait for 2-5 minutes after the vote. Thank you boole!\n" +
-                        $"{new Emoji("<:octo_hi:465374417644552192>")}");
-                    return;
-                }*/
 
                 string[] splittedArgs = null;
-                 if (args.Contains("  in ")) splittedArgs = args.Split(new[] {"  in "}, StringSplitOptions.None);
-                else if (args.Contains(" in  ")) splittedArgs = args.Split(new[] {" in  "}, StringSplitOptions.None);
-                else if (args.Contains("  in  ")) splittedArgs = args.Split(new[] {"  in  "}, StringSplitOptions.None);
-                else if (args.Contains(" in ")) splittedArgs = args.Split(new[] {" in "}, StringSplitOptions.None);
+                 if (args.ToLower().Contains("  in ")) splittedArgs = args.ToLower().Split(new[] {"  in "}, StringSplitOptions.None);
+                else if (args.ToLower().Contains(" in  ")) splittedArgs = args.ToLower().Split(new[] {" in  "}, StringSplitOptions.None);
+                else if (args.ToLower().Contains("  in  ")) splittedArgs = args.ToLower().Split(new[] {"  in  "}, StringSplitOptions.None);
+                else if (args.ToLower().Contains(" in ")) splittedArgs = args.ToLower().Split(new[] {" in "}, StringSplitOptions.None);
 
 
                 if (splittedArgs == null)
@@ -250,7 +233,7 @@ namespace OctoBot.Commands
                                   "(Time can be different, but follow the rules! **day-hour-minute-second**. You can skip any of those parts, but they have to be in the same order. One space or without it between each of the parts\n" +
                                   "I'm a loving order octopus!";
 
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, bigmess);
+                    await CommandHandeling.ReplyAsync(Context, bigmess);
 
                     return;
                 }
@@ -268,7 +251,7 @@ namespace OctoBot.Commands
                 var user = Global.Client.GetUser(userId);
 
 
-                var randomIndex = SecureRandom.Random(0, OctoNamePull.OctoNameRu.Length);
+                var randomIndex = _secureRandom.Random(0, OctoNamePull.OctoNameRu.Length-1);
                 var randomOcto = OctoNamePull.OctoNameRu[randomIndex];
                 var extra = randomOcto.Split(new[] {"]("}, StringSplitOptions.RemoveEmptyEntries);
                 var name = extra[0].Remove(0, 1);
@@ -276,9 +259,9 @@ namespace OctoBot.Commands
 
                 var embed = new EmbedBuilder();
                 embed.WithAuthor(Context.User);
-                embed.WithTimestamp(DateTimeOffset.UtcNow);
-                embed.WithColor(SecureRandom.Random(0, 255), SecureRandom.Random(0, 255),
-                    SecureRandom.Random(0, 255));
+                embed.WithCurrentTimestamp();
+                embed.WithColor(_secureRandom.Random(0, 255), _secureRandom.Random(0, 255),
+                    _secureRandom.Random(0, 255));
 
                 var bigmess2 =
                     $"{reminderString}\n\n" +
@@ -298,7 +281,7 @@ namespace OctoBot.Commands
                 UserAccounts.SaveAccounts(0);
 
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             catch
             {
@@ -323,7 +306,7 @@ namespace OctoBot.Commands
                         "(Time can be different, but follow the rules! **day-hour-minute-second**. You can skip any of those parts, but they have to be in the same order. One space or without it between each of the parts\n" +
                         "I'm a loving order octopus!";
 
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, bigmess);
+                    await CommandHandeling.ReplyAsync(Context, bigmess);
 
 
                     return;
@@ -339,7 +322,7 @@ namespace OctoBot.Commands
                 for (var i = 0; i < reminders.Count; i++)
                     embed.AddField($"[{i + 1}] {reminders[i].DateToPost:f}", reminders[i].ReminderMessage, true);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
             }
             catch
             {
@@ -369,7 +352,7 @@ namespace OctoBot.Commands
                             "(Time can be different, but follow the rules! **day-hour-minute-second**. You can skip any of those parts, but they have to be in the same order. One space or without it between each of the parts\n" +
                             "I'm a loving order octopus!";
 
-                        await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, bigmess);
+                        await CommandHandeling.ReplyAsync(Context, bigmess);
 
                         return;
                     }
@@ -385,7 +368,7 @@ namespace OctoBot.Commands
                         embed.AddField($"[{i + 1}] {reminders[i].DateToPost:f}", reminders[i].ReminderMessage, true);
 
 
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                    await CommandHandeling.ReplyAsync(Context, embed);
                 }
                 else
                 {
@@ -422,7 +405,7 @@ namespace OctoBot.Commands
                     embed.WithFooter("lil octo notebook");
 
 
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                    await CommandHandeling.ReplyAsync(Context, embed);
 
                     return;
                 }
@@ -431,7 +414,7 @@ namespace OctoBot.Commands
                     $"Booole...We could not find this reminder, could there be an error?\n" +
                     $"Try to see all of your reminders through the command `list`";
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, bigmess);
+                await CommandHandeling.ReplyAsync(Context, bigmess);
             }
             catch
             {
@@ -450,7 +433,7 @@ namespace OctoBot.Commands
             {
                 var bigmess = $"**UTC Current Time: {DateTime.UtcNow}**";
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, bigmess);
+                await CommandHandeling.ReplyAsync(Context, bigmess);
             }
             catch
             {
@@ -460,5 +443,92 @@ namespace OctoBot.Commands
                  HelperFunctions.DeleteMessOverTime(botMess, 5);
             }
         }
+
+
+
+        [Command("RemindOn", RunMode = RunMode.Async)]
+        [Alias("Remind On")]
+        public async Task AddReminderOn(string timeOn, [Remainder] string args)
+        {
+            try
+            {    
+                string[] splittedArgs = { };
+                if (args.ToLower().Contains("  at ")) splittedArgs = args.ToLower().Split(new[] {"  at "}, StringSplitOptions.None);
+                else if (args.ToLower().Contains(" at  ")) splittedArgs = args.ToLower().Split(new[] {" at  "}, StringSplitOptions.None);
+                else if (args.ToLower().Contains("  at  ")) splittedArgs = args.ToLower().Split(new[] {"  at  "}, StringSplitOptions.None);
+                else if (args.ToLower().Contains(" at ")) splittedArgs = args.ToLower().Split(new[] {" at "}, StringSplitOptions.None);
+               
+                if (!DateTime.TryParse(timeOn, out var myDate) ) //|| myDate < DateTime.Now
+                {
+                    await CommandHandeling.ReplyAsync(Context, "Date input is not correct, you can try this `yyyy-mm-dd`");
+                    return;
+                }          
+                if (splittedArgs == null)
+                {
+                    const string bigmess = "boole-boole... you are using this command incorrectly!!\n" +
+                                           "Right way: `Remind [text] in [time]`\n" +
+                                           "Between message and time **HAVE TO BE** written `in` part" +
+                                           "(Time can be different, but follow the rules! **day-hour-minute-second**. You can skip any of those parts, but they have to be in the same order. One space or without it between each of the parts\n" +
+                                           "I'm a loving order octopus!";
+                    await CommandHandeling.ReplyAsync(Context, bigmess);
+                    return;
+                }
+                var account = UserAccounts.GetAccount(Context.User, 0);
+                var accountForTimeZone = UserAccounts.GetAccount(Context.User, Context.Guild.Id);
+
+                
+                var timezone = accountForTimeZone.TimeZone ?? "UTC";
+
+                TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById($"{timezone}");
+                            
+                var timeString = splittedArgs[splittedArgs.Length-1];
+                
+                splittedArgs[splittedArgs.Length-1] = "";
+                var reminderString = string.Join(" at ", splittedArgs, 0, splittedArgs.Length-1);
+                var hourTime = TimeSpan.ParseExact(timeString, "h\\:mm", CultureInfo.CurrentCulture);
+
+                var timeDateTime = TimeZoneInfo.ConvertTimeToUtc(myDate + hourTime, tz);
+
+
+                var randomIndex = _secureRandom.Random(0, OctoNamePull.OctoNameRu.Length-1);
+                var randomOcto = OctoNamePull.OctoNameRu[randomIndex];
+
+                var extra = randomOcto.Split(new[] {"]("}, StringSplitOptions.RemoveEmptyEntries);
+                var name = extra[0].Remove(0, 1);
+                var url = extra[1].Remove(extra[1].Length - 1, 1);
+
+                var bigmess2 =
+                    $"{reminderString}\n\n" +
+                    $"We will send you a DM in  __**{myDate + hourTime}**__ `by {timezone}`\n";
+                var embed = new EmbedBuilder();
+                embed.WithAuthor(Context.User);
+                embed.WithCurrentTimestamp();
+                embed.WithColor(_secureRandom.Random(0, 255), _secureRandom.Random(0, 255),
+                    _secureRandom.Random(0, 255));
+                embed.AddField($"**____**", $"{bigmess2}");
+                embed.WithTitle($"{name} напомнит тебе:");
+                embed.WithUrl(url);
+
+                
+                var newReminder = new CreateReminder(timeDateTime, reminderString);
+
+                account.ReminderList.Add(newReminder);
+                UserAccounts.SaveAccounts(0);
+
+
+                await CommandHandeling.ReplyAsync(Context, embed);
+            }
+            catch (Exception e)
+            {
+                var botMess = await ReplyAsync(
+                    "boo... An error just appear >_< \n" +
+                    "Say `HelpRemind`");
+                 HelperFunctions.DeleteMessOverTime(botMess, 5);
+                ConsoleLogger.Log($" [REMINDER][Exception] ({Context.User.Username}) - {e.Message}",
+                    ConsoleColor.DarkBlue);
+                Console.WriteLine(e.Message);
+            }
+        }
+
     }
 }

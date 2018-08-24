@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
@@ -12,18 +13,18 @@ using OctoBot.Custom_Library;
 
 namespace OctoBot.Handeling
 {
-    public class CommandHandelingSendingAndUpdatingMessages
+    public class CommandHandeling
     {
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 #pragma warning disable CS1998 // This async method lacks 'await' operators and will run synchronously. Consider using the 'await' operator to await non-blocking API calls, or 'await Task.Run(...)' to do CPU-bound work on a background thread.
 
-        private readonly DiscordSocketClient _client;
+        private readonly DiscordShardedClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
         private const string LogFile = @"OctoDataBase/Log.json";
 
-        public CommandHandelingSendingAndUpdatingMessages(IServiceProvider services, CommandService commands,
-            DiscordSocketClient client)
+        public CommandHandeling(IServiceProvider services, CommandService commands,
+            DiscordShardedClient client)
         {
             _commands = commands;
             _services = services;
@@ -69,7 +70,7 @@ namespace OctoBot.Handeling
                 if (t.BotSocketMsg == null)
                     return;
 
-                var context = new SocketCommandContextCustom(_client, message, "edit");
+                var context = new ShardedCommandContextCustom(_client, message, "edit");
                 var argPos = 0;
 
 
@@ -80,7 +81,7 @@ namespace OctoBot.Handeling
                         argPos,
                         _services);
                   
-                    if (!resultTask.IsSuccess  && !resultTask.ErrorReason.Contains("Unknown command")) SendingMess(context, $"Booole! {resultTask.ErrorReason}");
+                    if (!resultTask.IsSuccess  && !resultTask.ErrorReason.Contains("Unknown command")) ReplyAsync(context, $"Booole! {resultTask.ErrorReason}");
                     return;
                 }
 
@@ -101,7 +102,7 @@ namespace OctoBot.Handeling
                         _services);
 
 
-                    if (!resultTaskk.IsSuccess  && !resultTaskk.ErrorReason.Contains("Unknown command")) SendingMess(context, $"Booole! {resultTaskk.ErrorReason}");
+                    if (!resultTaskk.IsSuccess  && !resultTaskk.ErrorReason.Contains("Unknown command")) ReplyAsync(context, $"Booole! {resultTaskk.ErrorReason}");
                 }
 
                 return;
@@ -110,7 +111,7 @@ namespace OctoBot.Handeling
             await Task.CompletedTask;
         }
 
-        public static async Task SendingMess(SocketCommandContextCustom context, EmbedBuilder embed)
+        public static async Task ReplyAsync(ShardedCommandContextCustom context, EmbedBuilder embed)
         {
             if (context.MessageContentForEdit == null)
             {
@@ -139,10 +140,16 @@ namespace OctoBot.Handeling
                         });
                     }
             }
+
+            if (Global.CommandList.Count >= 100)
+            {
+                var list = Global.CommandList.Skip(70).ToList();
+                Global.CommandList = list;
+            }
         }
 
 
-        public static async Task SendingMess(SocketCommandContextCustom context, [Remainder] string regularMess = null)
+        public static async Task ReplyAsync(ShardedCommandContextCustom context, [Remainder] string regularMess = null)
         {
             if (context.MessageContentForEdit == null)
             {
@@ -161,6 +168,11 @@ namespace OctoBot.Handeling
                             if (regularMess != null) message.Content = regularMess.ToString();
                         });
             }
+            if (Global.CommandList.Count >= 100)
+            {
+                var list = Global.CommandList.Skip(70).ToList();
+                Global.CommandList = list;
+            }
         }
 
 
@@ -170,7 +182,7 @@ namespace OctoBot.Handeling
             var message = msg as SocketUserMessage;
 
             if (message == null) return;
-            var context = new SocketCommandContextCustom(_client, message);
+            var context = new ShardedCommandContextCustom(_client, message);
             var argPos = 0;
 
             if (message.Author is SocketGuildUser userCheck && userCheck.IsMuted)
@@ -202,7 +214,7 @@ namespace OctoBot.Handeling
                                 $"{DateTime.Now.ToLongTimeString()} - DM: ERROR '{context.Channel}' {context.User}: {message} || {task.Result.ErrorReason} \n");
 
                             if(!task.Result.ErrorReason.Contains("Unknown command"))
-                            SendingMess(context, $"Booole! {task.Result.ErrorReason}");
+                            ReplyAsync(context, $"Booole! {task.Result.ErrorReason}");
                         }
                         else
                         {
@@ -249,7 +261,7 @@ namespace OctoBot.Handeling
                             $"{DateTime.Now.ToLongTimeString()} - ERROR '{context.Channel}' {context.User}: {message} || {task.Result.ErrorReason} \n");
 
                         if(!task.Result.ErrorReason.Contains("Unknown command"))
-                        SendingMess(context, $"Booole! {task.Result.ErrorReason}");
+                        ReplyAsync(context, $"Booole! {task.Result.ErrorReason}");
                     }
                     else
                     {

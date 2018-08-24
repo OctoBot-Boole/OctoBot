@@ -12,9 +12,16 @@ namespace OctoBot.Automated
 {
     public class TimerForChangingAvatar
     {
-        private static Timer _loopingTimerForOctoAva;
+        private readonly SecureRandom _secureRandom;
 
-        internal static Task TimerForChangeBotAvatar()
+        public TimerForChangingAvatar(SecureRandom secureRandom)
+        {
+            _secureRandom = secureRandom;
+        }
+
+        private  Timer _loopingTimerForOctoAva;
+
+        internal  Task TimerForChangeBotAvatar()
         {
             _loopingTimerForOctoAva = new Timer
             {
@@ -27,11 +34,12 @@ namespace OctoBot.Automated
             return Task.CompletedTask;
         }
 
-        public static async void SetBotAva(object sender, ElapsedEventArgs e)
+        public async void SetBotAva(object sender, ElapsedEventArgs e)
         {
             try
             {
-                var randomIndex = SecureRandom.Random(0, OctoPicPull.OctoPics.Length-1);
+                var octoIndex = OctoPicPull.OctoPics.Length - 1;
+                var randomIndex = _secureRandom.Random(0, octoIndex);
                 var octoToPost = OctoPicPull.OctoPics[randomIndex];
 
                 var webClient = new WebClient();

@@ -11,7 +11,7 @@ using OctoBot.Handeling;
 
 namespace OctoBot.Commands
 {
-    public class Top : ModuleBase<SocketCommandContextCustom>
+    public class Top : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("topo")]
         [Alias("topp")]
@@ -22,7 +22,7 @@ namespace OctoBot.Commands
             {
                 if (page < 1)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! Try different page <_<");
                     return;
                 }
@@ -36,7 +36,7 @@ namespace OctoBot.Commands
                 var lastPage = 1 + accounts.Count / (usersPerPage + 1);
                 if (page > lastPage)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         $"Boole. Last Page is {lastPage}");
                     return;
                 }
@@ -62,7 +62,7 @@ namespace OctoBot.Commands
                     embB.AddField($"#{i + usersPerPage * page} {user.Username}", $"{account.Points} OctoPoints", true);
                 }
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embB);
+                await CommandHandeling.ReplyAsync(Context, embB);
             }
             catch
             {
@@ -79,7 +79,7 @@ namespace OctoBot.Commands
             {
                 if (page < 1)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! Try different page <_<");
 
                     return;
@@ -95,7 +95,7 @@ namespace OctoBot.Commands
                 var lastPage = 1 + accounts.Count / (usersPerPage + 1);
                 if (page > lastPage)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         $"Boole. Last Page is {lastPage}");
 
                     return;
@@ -137,7 +137,7 @@ namespace OctoBot.Commands
                     embB.AddField($"#{i + usersPerPage * page} {user.Username}", $"{size} Subscribers", true);
                 }
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embB);
+                await CommandHandeling.ReplyAsync(Context, embB);
             }
             catch
             {
@@ -155,7 +155,7 @@ namespace OctoBot.Commands
             {
                 if (page < 1)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! Try different page <_<");
                     return;
                 }
@@ -178,7 +178,7 @@ namespace OctoBot.Commands
                 var lastPage = 1 + accounts.Count / (usersPerPage + 1);
                 if (page > lastPage)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         $"Boole. Last Page is {lastPage}");
 
                     return;
@@ -206,7 +206,7 @@ namespace OctoBot.Commands
                         true);
                 }
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embB);
+                await CommandHandeling.ReplyAsync(Context, embB);
             }
             catch
             {
@@ -224,7 +224,7 @@ namespace OctoBot.Commands
             {
                 if (page < 1)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! Try different page <_<");
                     return;
                 }
@@ -251,7 +251,7 @@ namespace OctoBot.Commands
                 var lastPage = 1 + accounts.Count / (usersPerPage + 1);
                 if (page > lastPage)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         $"Boole. Last Page is {lastPage}");
 
                     return;
@@ -281,7 +281,7 @@ namespace OctoBot.Commands
                         true);
                 }
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embB);
+                await CommandHandeling.ReplyAsync(Context, embB);
             }
             catch
             {
@@ -298,7 +298,7 @@ namespace OctoBot.Commands
             {
                 if (page < 1)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         "Boole! Try different page <_<");
                     return;
                 }
@@ -325,7 +325,7 @@ namespace OctoBot.Commands
                 var lastPage = 1 + accounts.Count / (usersPerPage + 1);
                 if (page > lastPage)
                 {
-                    await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context,
+                    await CommandHandeling.ReplyAsync(Context,
                         $"Boole. Last Page is {lastPage}");
                     return;
                 }
@@ -353,7 +353,7 @@ namespace OctoBot.Commands
                         true);
                 }
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embB);
+                await CommandHandeling.ReplyAsync(Context, embB);
             }
             catch
             {

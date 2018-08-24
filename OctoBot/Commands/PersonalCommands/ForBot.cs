@@ -16,20 +16,54 @@ using OctoBot.Helper;
 
 namespace OctoBot.Commands.PersonalCommands
 {
-    public class ForBot : ModuleBase<SocketCommandContextCustom>
+    public class ForBot : ModuleBase<ShardedCommandContextCustom>
     {
         [Command("LG")]
+        [Alias("topGuild")]
         [RequireOwner]
         [Description("Leve particular guild ( will show all guilds the bot in with no parameters)")]
-        public async Task LeaveGuild(ulong guildId = 1)
+        public async Task LeaveGuild(int page = 1)
         {
-            var guild = Global.Client.Guilds.ToList();
-            var text = "";
-            for (var i = 0; i < guild.Count; i++)
-                text += $"{i + 1}. {guild[i].Name} {guild[i].Id} (members: {guild[i].MemberCount})\n";
+            if (page < 1)
+            {
+                await CommandHandeling.ReplyAsync(Context,
+                    "Boole! Try different page <_<");
+                return;
+            }
 
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, text);
-            await Global.Client.GetGuild(guildId).LeaveAsync();
+            var accounts = Global.Client.Guilds.ToList().OrderByDescending(x => x.MemberCount).ToList();
+            const int usersPerPage = 9;
+
+            var lastPage = 1 + accounts.Count / (usersPerPage + 1);
+            if (page > lastPage)
+            {
+                await CommandHandeling.ReplyAsync(Context,
+                    $"Boole. Last Page is {lastPage}");
+                return;
+            }
+
+            var ordered = accounts;
+
+            var embB = new EmbedBuilder()
+                .WithTitle("Top By Guilds:")
+                .WithFooter(
+                    $"Page {page}/{lastPage} ● Say \"topGuild 2\" to see second page (you can edit previous message)");
+
+
+            page--;
+            for (var j = 0; j < ordered.Count; j++)
+                if (ordered[j].Id == Context.Guild.Id)
+                    embB.WithDescription(
+                        $"**#{j + usersPerPage * page + 1} {Context.Guild.Name} ({Context.Guild.Id}) {ordered[j].MemberCount} Members**\n**______**");
+
+            for (var i = 1; i <= usersPerPage && i + usersPerPage * page <= ordered.Count; i++)
+            {
+                var account = ordered[i - 1 + usersPerPage * page];
+                //var guildAccount = 
+                embB.AddField($"#{i + usersPerPage * page} {account.Name} ({account.Id})", $"{account.MemberCount} Members", true);
+            }
+
+            await CommandHandeling.ReplyAsync(Context, embB);
         }
 
 
@@ -60,7 +94,7 @@ namespace OctoBot.Commands.PersonalCommands
                 embed.WithFooter("lil octo notebook");
                 embed.AddField("Ошибка", $"Не можем поставить аватарку: {e.Message}");
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);*/
+                await CommandHandeling.ReplyAsync(Context, embed);*/
             }
         }
 
@@ -85,7 +119,7 @@ namespace OctoBot.Commands.PersonalCommands
                 embed.WithFooter("lil octo notebook");
                 embed.AddField("Ошибка", $"Не можем изменить игру: {e.Message}");
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);*/
+                await CommandHandeling.ReplyAsync(Context, embed);*/
             }
         }
 
@@ -113,7 +147,7 @@ namespace OctoBot.Commands.PersonalCommands
                 embed.WithFooter("lil octo notebook");
                 embed.AddField("Ошибка", $"Не можем изменить ник: {e.Message}");
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);*/
+                await CommandHandeling.ReplyAsync(Context, embed);*/
             }
         }
 
@@ -258,7 +292,7 @@ namespace OctoBot.Commands.PersonalCommands
                                                           $"After Stuffing: {afterStuff} - {afterStuff.Length - times * 8} characters\n" +
                                                           $"After Framing: **01111110**{afterStuff}**01111110**");
 
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+            await CommandHandeling.ReplyAsync(Context, embed);
         }
 
 
@@ -268,7 +302,7 @@ namespace OctoBot.Commands.PersonalCommands
         public async Task GetInviteToTheServer(ulong guildId)
         {
             var inviteUrl = Global.Client.GetGuild(guildId).DefaultChannel.CreateInviteAsync();
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, $"{inviteUrl.Result.Url}");
+            await CommandHandeling.ReplyAsync(Context, $"{inviteUrl.Result.Url}");
         }
 
 
@@ -289,15 +323,24 @@ namespace OctoBot.Commands.PersonalCommands
             sw.Stop();
 
             await HelperFunctions.DeleteMessOverTime(msg, 0);
+            var wtf = Global.CommandList;
+
+
+
+
 
             var embed = new EmbedBuilder();
-            embed.WithColor(SecureRandom.Random(254), SecureRandom.Random(254), SecureRandom.Random(254));
+            embed.WithColor(SecureRandomStatic.Random(254), SecureRandomStatic.Random(254), SecureRandomStatic.Random(254));
             embed.AddField("Bot Statistics:", $"Your ping: {(int) sw.Elapsed.TotalMilliseconds}ms\n" +
                                               $"Runtime: {time.Hours}h:{time.Minutes}m\n" +
-                                              $"CPU usage: {cpu:n0} (not right)\n" +
+                                              //$"CPU usage: {cpu:n0} (not right)\n" +
                                               $"Memory: {mem:n0}Mb\n" +
-                                              $"Threads using: {threads.Count}\n");
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                                              $"Threads using: {threads.Count}\n" +
+                                              $"Commands in cache(100 max): {wtf.Count}\n" +
+                                              $"Servers in: {Global.Client.Guilds.Count}\n");
+            await CommandHandeling.ReplyAsync(Context, embed);
+
+
         }
 
     }

@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace OctoBot.Commands
 {
-    public class RandomCommandsKek //: ModuleBase<SocketCommandContext>
+    public class RandomCommandsKek //: ModuleBase<ShardedCommandContext>
     {
 
 

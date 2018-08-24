@@ -8,7 +8,7 @@ namespace OctoBot.Commands
 {
 
 
-    public class HelpCommand : ModuleBase<SocketCommandContextCustom>
+    public class HelpCommand : ModuleBase<ShardedCommandContextCustom>
     {
 
         //TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO//TODO
@@ -19,6 +19,7 @@ namespace OctoBot.Commands
          * 3) role NameOfTheRome - asdding you the role
          * 4) User Statistics (how many messages, where, editts, deletes.)
          * 5) `*clear 5 @user` delete only user's messages
+         * 6) добавить войс в хелп
          *
          * actually TODO: 
          */
@@ -78,7 +79,7 @@ namespace OctoBot.Commands
 
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.LightOrange);
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+            await CommandHandeling.ReplyAsync(Context, embed);
 
         }
 
@@ -107,7 +108,7 @@ namespace OctoBot.Commands
 
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.LightOrange);
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
 
 
             // embed.AddField("цитата [имя] [текст...] ", "Фейковая цитата от @юзера (*скриншот* с цветом, аватаркой, и текст)"); //font is NOT INCLUDET
@@ -131,7 +132,7 @@ namespace OctoBot.Commands
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.LightOrange);
 
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+            await CommandHandeling.ReplyAsync(Context, embed);
 
         }
 
@@ -171,7 +172,7 @@ namespace OctoBot.Commands
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.LightOrange);
 
-            await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+            await CommandHandeling.ReplyAsync(Context, embed);
         }
 
 
@@ -211,7 +212,7 @@ namespace OctoBot.Commands
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.LightOrange);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
   
         }
 
@@ -245,7 +246,7 @@ namespace OctoBot.Commands
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.LightOrange);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
   
         }
 
@@ -276,7 +277,7 @@ namespace OctoBot.Commands
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.Blue);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
         }  
     }
 }
@@ -324,7 +325,7 @@ namespace OctoBot.Commands
       
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.LightOrange);
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
 
         }
        
@@ -356,7 +357,7 @@ namespace OctoBot.Commands
 
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.LightOrange);
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
 
 
             // embed.AddField("цитата [имя] [текст...] ", "Фейковая цитата от @юзера (*скриншот* с цветом, аватаркой, и текст)"); //font is NOT INCLUDET
@@ -404,7 +405,7 @@ namespace OctoBot.Commands
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.LightOrange);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
         }
 
 
@@ -427,7 +428,7 @@ namespace OctoBot.Commands
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.LightOrange);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
   
         }
 
@@ -461,7 +462,7 @@ namespace OctoBot.Commands
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.LightOrange);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
   
         }
 
@@ -492,7 +493,7 @@ namespace OctoBot.Commands
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.Blue);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
         }
 
         [Command("HelpExtra")]
@@ -513,7 +514,7 @@ namespace OctoBot.Commands
             embed.WithFooter("lil octo notebook");
             embed.WithColor(Color.LightOrange);
 
-                await CommandHandelingSendingAndUpdatingMessages.SendingMess(Context, embed);
+                await CommandHandeling.ReplyAsync(Context, embed);
   
         }
         */

@@ -63,6 +63,8 @@ namespace OctoBot.Configs.Users
         public List<CreateVoiceChannel> VoiceChannelList { get; internal set; } = new List<CreateVoiceChannel>();
         public DateTime LastOctoPic { get; set; }
         public string MyPrefix { get; set; }
+        public DateTime Birthday { get; set; }
+        public string TimeZone { get; set; }
 
         public ConcurrentDictionary<string, ulong> UserStatistics { get; set; } = new ConcurrentDictionary<string, ulong>();
 
